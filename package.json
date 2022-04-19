@@ -1,0 +1,8 @@
+{
+  "name": "dankarlin.github.io",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dankarlin/dankarlin.github.io.git",
+  "author": "Dan Karlin <dankarlin@gmail.com>",
+  "license": "MIT"
+}
