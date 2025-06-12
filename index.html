@@ -34,9 +34,25 @@
     <!-- Preload Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://media.licdn.com" />
+    <link rel="preload" href="https://media.licdn.com/dms/image/v2/D4E03AQE5RE2GaIroLg/profile-displayphoto-shrink_200_200/B4EZbwtTcsHAAc-/0/1747795131282?e=2147483647&v=beta&t=pF2Zzbze2OnJmNioI4wag_TJkqzk3ssHBhtPD2w9Lms" as="image" />
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#1e40af" />
+    
+    <!-- Critical CSS for LCP optimization -->
+    <style>
+      /* Inline critical CSS for hero section */
+      body { margin: 0; padding-top: 76px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; font-display: swap; }
+      .hero-section { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%); min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; }
+      .hero-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat; will-change: transform; pointer-events: none; }
+      @keyframes float { 0%, 100% { transform: translate3d(0, 0px, 0); } 50% { transform: translate3d(0, -10px, 0); } }
+      @media (prefers-reduced-motion: no-preference) { .hero-section::before { animation: float 20s ease-in-out infinite; } }
+      .profile-photo { width: 200px; height: 200px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); object-fit: cover; margin: 0 auto; display: block; }
+      .display-3 { font-weight: 700; letter-spacing: -0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+      /* Prevent layout shift */
+      .container, .row, .col { max-width: 100%; }
+    </style>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -87,8 +103,8 @@
       ]
     }
     </script>
-    <script type="module" crossorigin src="/assets/index-BtHD-3CY.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-2m8DM5ZM.css">
+    <script type="module" crossorigin src="/assets/index-BSaFjq_U.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BbPerafq.css">
   </head>
   <body>
     <div id="root"></div>
