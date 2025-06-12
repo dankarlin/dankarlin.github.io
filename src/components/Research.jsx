@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap'
+import { Container, Row, Col, Card, Badge } from 'react-bootstrap'
 
 function Research() {
   const researchAreas = [
@@ -42,26 +42,26 @@ function Research() {
               digital biomarkers, clinical informatics, and innovative therapeutic approaches.
             </p>
             <div className="d-flex justify-content-center gap-3 mb-4">
-              <Button 
-                variant="primary" 
+              <a 
                 href="https://scholar.google.com/citations?user=mCflbZoAAAAJ&hl=en"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="d-flex align-items-center"
+                className="btn btn-outline-primary d-flex align-items-center text-decoration-none"
+                aria-label="Visit Dr. Dan Karlin's Google Scholar profile (opens in new tab)"
               >
-                <i className="bi bi-mortarboard me-2"></i>
+                <i className="bi bi-mortarboard me-2" aria-hidden="true"></i>
                 Google Scholar Profile
-              </Button>
-              <Button 
-                variant="outline-primary"
+              </a>
+              <a 
                 href="https://pubmed.ncbi.nlm.nih.gov/?term=Karlin+DR%5BAuthor%5D"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="d-flex align-items-center"
+                className="btn btn-outline-primary d-flex align-items-center text-decoration-none"
+                aria-label="Search Dr. Dan Karlin's publications on PubMed (opens in new tab)"
               >
-                <i className="bi bi-journal-medical me-2"></i>
+                <i className="bi bi-journal-medical me-2" aria-hidden="true"></i>
                 PubMed Publications
-              </Button>
+              </a>
             </div>
           </Col>
         </Row>
