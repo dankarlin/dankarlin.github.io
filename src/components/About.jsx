@@ -19,14 +19,14 @@ function About() {
               <p className="lead">
                 I'm a board-certified physician and healthcare innovator with expertise in psychiatry, 
                 addiction medicine, and clinical informatics. As Chief Medical Officer at MindMed, 
-                I lead the development of breakthrough digital therapeutics for mental health and addiction.
+                I lead the development of breakthrough digital therapeutics for psychiatry and addiction.
               </p>
               <p>
                 My career bridges traditional medicine with cutting-edge technology. I'm passionate about 
                 leveraging digital biomarkers, clinical informatics, and innovative trial designs to 
                 transform patient care. As Chair of the Digital Medicine Society (DiMe) Board and recipient 
                 of "40 Under 40 Healthcare Innovators" recognition, I'm committed to advancing the field 
-                of digital health through research, leadership, and clinical excellence. My research portfolio 
+                of digital medicine through research, leadership, and clinical excellence. My research portfolio 
                 includes peer-reviewed publications in digital medicine, clinical informatics, and psychiatric innovation.
               </p>
             </div>

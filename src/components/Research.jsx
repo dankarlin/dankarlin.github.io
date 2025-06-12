@@ -5,7 +5,7 @@ function Research() {
   const researchAreas = [
     {
       title: 'Digital Medicine & Biomarkers',
-      description: 'Advancing the development and validation of digital biomarkers for mental health and neurological conditions.',
+      description: 'Advancing the development and validation of digital biomarkers for psychiatric and neurological conditions.',
       icon: 'bi-graph-up'
     },
     {
@@ -15,7 +15,7 @@ function Research() {
     },
     {
       title: 'Psychedelic Medicine',
-      description: 'Pioneering research in psychedelic-assisted therapies for treatment-resistant mental health conditions.',
+      description: 'Pioneering research in psychedelic-assisted therapies for treatment-resistant psychiatric conditions.',
       icon: 'bi-heart-pulse'
     },
     {
@@ -95,14 +95,14 @@ function Research() {
                   <Col md={8}>
                     <h4 className="mb-3">Academic Impact</h4>
                     <p className="mb-2">
-                      My research contributions span multiple domains of digital health, with publications in 
+                      My research contributions span multiple domains of digital medicine, with publications in 
                       peer-reviewed journals and presentations at major medical conferences.
                     </p>
                     <div className="d-flex gap-3 flex-wrap">
                       <Badge bg="primary" className="p-2">Digital Biomarkers</Badge>
                       <Badge bg="primary" className="p-2">Clinical Trials</Badge>
                       <Badge bg="primary" className="p-2">Healthcare Technology</Badge>
-                      <Badge bg="primary" className="p-2">Mental Health</Badge>
+                      <Badge bg="primary" className="p-2">Psychiatry</Badge>
                     </div>
                   </Col>
                   <Col md={4} className="text-center">
