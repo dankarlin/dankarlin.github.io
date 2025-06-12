@@ -42,9 +42,9 @@ function Hero() {
               </Col>
               <Col md={6} className="text-center">
                 <div className="fade-in">
-                  {/* Professional Photo from LinkedIn */}
+                  {/* Professional Photo - Local Hosting */}
                   <ProfilePhoto 
-                    src="https://media.licdn.com/dms/image/v2/D4E03AQE5RE2GaIroLg/profile-displayphoto-shrink_200_200/B4EZbwtTcsHAAc-/0/1747795131282?e=2147483647&v=beta&t=pF2Zzbze2OnJmNioI4wag_TJkqzk3ssHBhtPD2w9Lms"
+                    src="/dan-karlin-photo.jpg"
                     alt="Dr. Dan Karlin - Chief Medical Officer"
                     className="mb-4"
                   />
