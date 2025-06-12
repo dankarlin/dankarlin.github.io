@@ -40,6 +40,53 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Dr. Dan Karlin",
+      "jobTitle": "Chief Medical Officer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "MindMed"
+      },
+      "description": "Board-certified physician specializing in digital medicine, clinical informatics, and psychiatry innovation",
+      "url": "https://dankarlin.com",
+      "image": "https://media.licdn.com/dms/image/v2/D4E03AQE5RE2GaIroLg/profile-displayphoto-shrink_200_200/B4EZbwtTcsHAAc-/0/1747795131282?e=2147483647&v=beta&t=pF2Zzbze2OnJmNioI4wag_TJkqzk3ssHBhtPD2w9Lms",
+      "sameAs": [
+        "https://linkedin.com/in/dankarlin",
+        "https://twitter.com/dankarlin",
+        "https://scholar.google.com/citations?user=mCflbZoAAAAJ&hl=en"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "New York",
+        "addressRegion": "NY",
+        "addressCountry": "US"
+      },
+      "alumniOf": {
+        "@type": "Organization",
+        "name": "University of Colorado Anschutz Medical Campus"
+      },
+      "memberOf": [
+        {
+          "@type": "Organization",
+          "name": "Digital Medicine Society (DiMe)",
+          "description": "Chair, Board of Directors"
+        },
+        {
+          "@type": "Organization",
+          "name": "American Psychiatric Association"
+        },
+        {
+          "@type": "Organization",
+          "name": "American Society of Addiction Medicine"
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

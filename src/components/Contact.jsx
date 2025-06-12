@@ -26,8 +26,9 @@ function Contact() {
                       href="mailto:dankarlin@gmail.com"
                       className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
                       style={{fontSize: '0.9rem', padding: '10px 20px'}}
+                      aria-label="Send email to Dr. Dan Karlin"
                     >
-                      <i className="bi bi-envelope me-2"></i>
+                      <i className="bi bi-envelope me-2" aria-hidden="true"></i>
                       Email Me
                     </a>
                     
@@ -37,8 +38,9 @@ function Contact() {
                       rel="noopener noreferrer"
                       className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
                       style={{fontSize: '0.9rem', padding: '10px 20px'}}
+                      aria-label="Visit Dr. Dan Karlin's LinkedIn profile (opens in new tab)"
                     >
-                      <i className="bi bi-linkedin me-2"></i>
+                      <i className="bi bi-linkedin me-2" aria-hidden="true"></i>
                       LinkedIn
                     </a>
                     
@@ -48,8 +50,9 @@ function Contact() {
                       rel="noopener noreferrer"
                       className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
                       style={{fontSize: '0.9rem', padding: '10px 20px'}}
+                      aria-label="Visit Dr. Dan Karlin's Twitter profile (opens in new tab)"
                     >
-                      <i className="bi bi-twitter me-2"></i>
+                      <i className="bi bi-twitter me-2" aria-hidden="true"></i>
                       Twitter
                     </a>
                     
@@ -59,8 +62,9 @@ function Contact() {
                       rel="noopener noreferrer"
                       className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
                       style={{fontSize: '0.9rem', padding: '10px 20px'}}
+                      aria-label="Visit Dr. Dan Karlin's Google Scholar profile (opens in new tab)"
                     >
-                      <i className="bi bi-mortarboard me-2"></i>
+                      <i className="bi bi-mortarboard me-2" aria-hidden="true"></i>
                       Google Scholar
                     </a>
                   </div>

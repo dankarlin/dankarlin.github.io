@@ -28,8 +28,10 @@ function ProfilePhoto({ src, alt = "Dan Karlin", className = "" }) {
     <img 
       src={src} 
       alt={alt}
+      width="200"
+      height="200"
       className={`profile-photo ${className}`}
-      loading="lazy"
+      loading="eager"
       decoding="async"
       style={{
         width: '200px',

@@ -23,16 +23,18 @@ function Hero() {
                       href="#about" 
                       className="btn btn-outline-light btn-lg mb-2 text-decoration-none"
                       role="button"
+                      aria-label="Navigate to About section to learn more about Dr. Dan Karlin"
                     >
-                      <i className="bi bi-person-circle me-2"></i>
+                      <i className="bi bi-person-circle me-2" aria-hidden="true"></i>
                       Learn More About Me
                     </a>
                     <a 
                       href="#contact" 
                       className="btn btn-outline-light btn-lg mb-2 text-decoration-none"
                       role="button"
+                      aria-label="Navigate to Contact section to get in touch with Dr. Dan Karlin"
                     >
-                      <i className="bi bi-envelope me-2"></i>
+                      <i className="bi bi-envelope me-2" aria-hidden="true"></i>
                       Get In Touch
                     </a>
                   </div>
