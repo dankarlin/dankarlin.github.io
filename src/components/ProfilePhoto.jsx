@@ -23,26 +23,29 @@ function ProfilePhoto({ src, alt = "Dan Karlin", className = "" }) {
     )
   }
 
-  // If src is provided, show the actual image
+  // If src is provided, show the actual image with optimized loading
   return (
-    <img 
-      src={src} 
-      alt={alt}
-      width="200"
-      height="200"
-      className={`profile-photo ${className}`}
-      loading="eager"
-      decoding="async"
-      style={{
-        width: '200px',
-        height: '200px',
-        borderRadius: '50%',
-        objectFit: 'cover',
-        border: '4px solid rgba(255, 255, 255, 0.3)',
-        margin: '0 auto',
-        display: 'block'
-      }}
-    />
+    <div style={{ width: '200px', height: '200px', margin: '0 auto', position: 'relative' }}>
+      <img 
+        src={src} 
+        alt={alt}
+        width="200"
+        height="200"
+        className={`profile-photo ${className}`}
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
+        style={{
+          width: '200px',
+          height: '200px',
+          borderRadius: '50%',
+          objectFit: 'cover',
+          border: '4px solid rgba(255, 255, 255, 0.3)',
+          display: 'block',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)' // Fallback background
+        }}
+      />
+    </div>
   )
 }
 
