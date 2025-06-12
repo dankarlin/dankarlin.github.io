@@ -7,8 +7,8 @@ function Experience() {
       title: 'Chief Medical Officer',
       company: 'MindMed',
       period: '2022 - Present',
-      description: 'Leading medical strategy and clinical development for breakthrough digital therapeutics in psychiatry and addiction. Overseeing clinical trials, regulatory strategy, and product development for innovative psychedelic-assisted therapies.',
-      technologies: ['Digital Therapeutics', 'Clinical Trials', 'Regulatory Affairs', 'Medical Strategy']
+      description: 'Leading medical strategy and clinical development for breakthrough psychedelic medicines targeting brain health disorders. Overseeing clinical trials, regulatory strategy, and product development for innovative psychedelic therapies.',
+      technologies: ['Psychedelic Medicine', 'Clinical Trials', 'Regulatory Affairs', 'Medical Strategy']
     },
     {
       title: 'Chair, Board of Directors',

@@ -15,7 +15,7 @@ function Hero() {
                   <p className="h3 mb-4" role="heading" aria-level="2">Chief Medical Officer & Digital Medicine Innovator</p>
                   <p className="lead mb-4">
                     Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. 
-                    Leading the future of psychiatry and addiction treatment through technology at MindMed.
+                    Leading the development of psychedelic medicines for brain health disorders at MindMed.
                   </p>
                   <div className="section-divider d-none d-md-block"></div>
                   <div className="d-flex gap-3 justify-content-center justify-content-md-start flex-wrap">
