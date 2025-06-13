@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="text" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle with gradient -->
+  <circle cx="24" cy="24" r="22" fill="url(#bg)" stroke="#1e40af" stroke-width="2"/>
+  
+  <!-- Artistic D -->
+  <path d="M12 14 L12 34 L20 34 C26 34 30 30 30 24 C30 18 26 14 20 14 Z M16 18 L20 18 C23 18 26 20 26 24 C26 28 23 30 20 30 L16 30 Z" fill="url(#text)" stroke="#f1f5f9" stroke-width="0.5"/>
+  
+  <!-- Artistic K with modern styling -->
+  <path d="M32 14 L32 34 M32 24 L40 14 M32 24 L40 34" stroke="url(#text)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Subtle accent dot -->
+  <circle cx="36" cy="20" r="1.5" fill="#60a5fa" opacity="0.8"/>
+</svg>
