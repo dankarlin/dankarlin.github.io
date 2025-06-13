@@ -16,14 +16,14 @@
     <meta property="og:url" content="https://dankarlin.com/" />
     <meta property="og:title" content="Dr. Dan Karlin - Chief Medical Officer & Digital Medicine Innovator" />
     <meta property="og:description" content="Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. Leading the development of psychedelic medicines for brain health disorders at MindMed." />
-    <meta property="og:image" content="https://dankarlin.com/dan-karlin-photo.jpg" />
+    <meta property="og:image" content="https://dankarlin.com/dan-karlin-photo.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://dankarlin.com/" />
     <meta property="twitter:title" content="Dr. Dan Karlin - Chief Medical Officer & Digital Medicine Innovator" />
     <meta property="twitter:description" content="Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. Leading the development of psychedelic medicines for brain health disorders at MindMed." />
-    <meta property="twitter:image" content="https://dankarlin.com/dan-karlin-photo.jpg" />
+    <meta property="twitter:image" content="https://dankarlin.com/dan-karlin-photo.webp" />
     <meta name="twitter:creator" content="@dankarlin" />
     
     <!-- Additional Meta Tags -->
@@ -33,7 +33,9 @@
     
     <!-- Preload Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preload" href="/dan-karlin-photo.jpg" as="image" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" href="/dan-karlin-photo.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="/dan-karlin-photo.jpg" as="image" type="image/jpeg" />
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
     
     <!-- Theme Color -->
@@ -69,7 +71,7 @@
       },
       "description": "Board-certified physician specializing in digital medicine, clinical informatics, and psychedelic medicines for brain health disorders",
       "url": "https://dankarlin.com",
-      "image": "https://dankarlin.com/dan-karlin-photo.jpg",
+      "image": "https://dankarlin.com/dan-karlin-photo.webp",
       "sameAs": [
         "https://linkedin.com/in/dankarlin",
         "https://twitter.com/dankarlin",
@@ -102,10 +104,40 @@
       ]
     }
     </script>
-    <script type="module" crossorigin src="/assets/index-D3a7EBaX.js"></script>
+    <script type="module" crossorigin src="/assets/index-BKyVmBX1.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-DJG_os-6.js">
+    <link rel="modulepreload" crossorigin href="/assets/bootstrap-BGqVinLl.js">
     <link rel="stylesheet" crossorigin href="/assets/index-BbPerafq.css">
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+      
+      // Web Vitals tracking
+      import('https://unpkg.com/web-vitals@3/dist/web-vitals.js').then(({getCLS, getFID, getFCP, getLCP, getTTFB}) => {
+        function sendToAnalytics(metric) {
+          // Log to console for now - could send to analytics service
+          console.log(metric);
+        }
+        getCLS(sendToAnalytics);
+        getFID(sendToAnalytics);
+        getFCP(sendToAnalytics);
+        getLCP(sendToAnalytics);
+        getTTFB(sendToAnalytics);
+      });
+    </script>
   </body>
 </html>
