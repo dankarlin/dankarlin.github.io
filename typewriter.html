@@ -65,6 +65,7 @@ body {
   bottom: 50%;
   overflow: hidden;
   pointer-events: none;
+  font-size: clamp(10px, 1.35vw, 14px); /* em base for children and background-size */
   /* subtle horizontal rules matching line height */
   background-image: repeating-linear-gradient(
     to bottom,
@@ -78,10 +79,11 @@ body {
 }
 
 /* Anchor to the bottom of the overlay so text grows upward as quotes accumulate.
-   Overflow is clipped by parent's overflow:hidden at the platen line. */
+   bottom: 1.8em reserves one blank line above the platen so the last typed
+   line never runs into the ribbon/bail area. */
 .paper-lines-container {
   position: absolute;
-  bottom: 8px;
+  bottom: 1.8em;
   left: 14px;
   right: 14px;
   /* paper-advance animation target */
@@ -102,7 +104,6 @@ body {
 
 .paper-line {
   font-family: 'Special Elite', 'American Typewriter', 'Courier New', monospace;
-  font-size: clamp(10px, 1.35vw, 14px);
   line-height: 1.6;
   color: #1e1509;
   word-break: break-word;
