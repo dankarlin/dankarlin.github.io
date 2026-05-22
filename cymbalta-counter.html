@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cymbalta® Counter</title>
+<meta name="description" content="A live counter tracking how long it has been since Eli Lilly announced FDA approval of Cymbalta® for Generalized Anxiety Disorder.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    color: #e0ddd5;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(10,10,15,0.95) 0%, transparent 100%);
+  }
+
+  .nav-home {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-home:hover { color: #aaa; }
+
+  .nav-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: #2a2a35;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 7rem 2rem 5rem;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .main::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(180, 140, 60, 0.055) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* ── FRAMING TEXT ── */
+  .framing {
+    max-width: 680px;
+    margin-bottom: 4rem;
+    position: relative;
+  }
+
+  .framing-upper {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: 1.5rem;
+  }
+
+  .framing-statement {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    font-weight: 400;
+    line-height: 1.45;
+    color: #9a968e;
+  }
+
+  .framing-statement .it-has-been {
+    color: #555;
+    font-style: italic;
+  }
+
+  .framing-statement .drug-name {
+    color: #c8b97a;
+    font-style: normal;
+  }
+
+  .framing-statement .indication {
+    color: #e0ddd5;
+  }
+
+  /* ── COUNTER ── */
+  .counter-grid {
+    display: flex;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: flex-end;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .counter-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    position: relative;
+  }
+
+  .counter-value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 7.5rem);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: #e8e4dc;
+    transition: color 0.1s;
+  }
+
+  .counter-unit.years .counter-value {
+    font-size: clamp(4.5rem, 12vw, 10rem);
+    color: #c8b97a;
+  }
+
+  .counter-unit.seconds .counter-value {
+    color: #4a4a5a;
+  }
+
+  .counter-label {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #333;
+  }
+
+  .counter-unit.years .counter-label {
+    color: #6b5d2e;
+  }
+
+  /* Separators between units */
+  .counter-sep {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: #1e1e26;
+    line-height: 1;
+    margin-bottom: 1.8rem;
+    user-select: none;
+  }
+
+  /* Pulse on tick */
+  @keyframes tickPulse {
+    0% { color: #6a6a82; }
+    100% { color: #4a4a5a; }
+  }
+
+  .tick-flash {
+    animation: tickPulse 0.4s ease-out forwards;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, #222, transparent);
+    margin: 0 auto 2.5rem;
+  }
+
+  /* ── SUBTEXT ── */
+  .subtext {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.8rem, 1.5vw, 0.92rem);
+    color: #383838;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    line-height: 1.7;
+    max-width: 500px;
+  }
+
+  /* ── FOOTNOTE ── */
+  .footer {
+    padding: 2.5rem 2rem 3rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin-top: auto;
+  }
+
+  .footnote {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: #2c2c38;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.8;
+  }
+
+  .footnote a {
+    color: #383848;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+  }
+
+  .footnote a:hover { color: #666; }
+
+  .footnote .sep {
+    margin: 0 0.5em;
+    color: #222;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .counter-sep { display: none; }
+    .counter-grid { gap: 1.2rem; }
+    .framing { margin-bottom: 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-home" href="/">dankarlin.com</a>
+  <span class="nav-tag">Since Feb 26, 2007</span>
+</nav>
+
+<main class="main">
+
+  <div class="framing">
+    <div class="framing-upper">A live measurement</div>
+    <div class="framing-statement">
+      <span class="it-has-been">It has been</span><br>
+      <span class="indication">this long</span>
+      since Eli Lilly announced<br>
+      FDA approval of <span class="drug-name">Cymbalta®</span><br>
+      for Generalized Anxiety Disorder.
+    </div>
+  </div>
+
+  <div class="counter-grid">
+    <div class="counter-unit years">
+      <div class="counter-value" id="years">—</div>
+      <div class="counter-label">Years</div>
+    </div>
+
+    <div class="counter-sep">·</div>
+
+    <div class="counter-unit days">
+      <div class="counter-value" id="days">—</div>
+      <div class="counter-label">Days</div>
+    </div>
+
+    <div class="counter-sep">·</div>
+
+    <div class="counter-unit hours">
+      <div class="counter-value" id="hours">—</div>
+      <div class="counter-label">Hours</div>
+    </div>
+
+    <div class="counter-sep">·</div>
+
+    <div class="counter-unit minutes">
+      <div class="counter-value" id="minutes">—</div>
+      <div class="counter-label">Minutes</div>
+    </div>
+
+    <div class="counter-sep">·</div>
+
+    <div class="counter-unit seconds">
+      <div class="counter-value" id="seconds">—</div>
+      <div class="counter-label">Seconds</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="subtext">
+    Duloxetine (Cymbalta®) is a serotonin–norepinephrine reuptake inhibitor.<br>
+    The clock has not stopped.
+  </p>
+
+</main>
+
+<footer class="footer">
+  <div class="footnote">
+    FDA approval announced February 26, 2007.
+    <span class="sep">·</span>
+    <a href="https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2007/021427s015ltr.pdf" target="_blank" rel="noopener">FDA approval letter</a>
+    <span class="sep">·</span>
+    Cymbalta® is a registered trademark of Eli Lilly and Company.
+    <br>
+    This page is not affiliated with or endorsed by Eli Lilly and Company or the FDA.
+  </div>
+</footer>
+
+<script>
+  // Start date: February 26, 2007 — FDA approval announced
+  const START = new Date('2007-02-26T00:00:00');
+
+  const el = {
+    years:   document.getElementById('years'),
+    days:    document.getElementById('days'),
+    hours:   document.getElementById('hours'),
+    minutes: document.getElementById('minutes'),
+    seconds: document.getElementById('seconds'),
+  };
+
+  let lastSeconds = -1;
+
+  function pad(n, width = 2) {
+    return String(n).padStart(width, '0');
+  }
+
+  function update() {
+    const now = new Date();
+    const totalMs = now - START;
+
+    // Total seconds elapsed
+    const totalSec = Math.floor(totalMs / 1000);
+
+    // Years: count actual calendar years
+    let years = now.getFullYear() - START.getFullYear();
+    const anniversaryThisYear = new Date(now.getFullYear(), START.getMonth(), START.getDate());
+    if (now < anniversaryThisYear) years--;
+
+    // Days since last anniversary
+    const lastAnniversary = new Date(START.getFullYear() + years, START.getMonth(), START.getDate());
+    const msSinceAnniversary = now - lastAnniversary;
+    const daysSinceAnniversary = Math.floor(msSinceAnniversary / (1000 * 60 * 60 * 24));
+
+    // Time components within current day
+    const remainder = msSinceAnniversary - daysSinceAnniversary * 86400000;
+    const hours   = Math.floor(remainder / 3600000);
+    const minutes = Math.floor((remainder % 3600000) / 60000);
+    const seconds = Math.floor((remainder % 60000) / 1000);
+
+    el.years.textContent   = years;
+    el.days.textContent    = pad(daysSinceAnniversary, 3);
+    el.hours.textContent   = pad(hours);
+    el.minutes.textContent = pad(minutes);
+
+    if (seconds !== lastSeconds) {
+      el.seconds.textContent = pad(seconds);
+      el.seconds.classList.remove('tick-flash');
+      // force reflow for animation restart
+      void el.seconds.offsetWidth;
+      el.seconds.classList.add('tick-flash');
+      lastSeconds = seconds;
+    }
+  }
+
+  update();
+  setInterval(update, 250);
+</script>
+
+</body>
+</html>
