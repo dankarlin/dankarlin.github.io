@@ -592,6 +592,7 @@ function typeQuote(quoteObj, container) {
 // ── Segment helpers ───────────────────────────────────────────
 
 function parseSegments(html) {
+  html = html.replace(/<br\s*\/?>/gi, ' ');
   const segments = [];
   const re = /<em>([\s\S]*?)<\/em>/g;
   let last = 0, m;
