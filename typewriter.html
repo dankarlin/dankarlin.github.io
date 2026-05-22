@@ -412,6 +412,7 @@ const MAX_OLD_LINES = 3;      // non-current quote blocks to keep
 let quotesMap = {};           // { 'HH:MM': [ {time, quote, source}, ... ] }
 let typingTimer = null;
 let clockStarted = false;
+let pendingAdvanceTimer = null;
 
 // ── Generate key circles ─────────────────────────────────────
 
@@ -502,6 +503,7 @@ function pickQuote(key) {
 }
 
 function showCurrentQuote() {
+  if (document.hidden) return;
   const key   = timeKey();
   const quote = pickQuote(key);
   updateStatusBar(key);
@@ -512,6 +514,7 @@ function showCurrentQuote() {
 
 function advancePaper(quoteObj) {
   if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  if (pendingAdvanceTimer) { clearTimeout(pendingAdvanceTimer); pendingAdvanceTimer = null; }
 
   const container = document.getElementById('paperContainer');
 
@@ -522,7 +525,9 @@ function advancePaper(quoteObj) {
   }, { once: true });
 
   // After animation starts, age the existing lines and add new one
-  setTimeout(() => {
+  pendingAdvanceTimer = setTimeout(() => {
+    pendingAdvanceTimer = null;
+    if (document.hidden) return;
     ageLines(container);
     typeQuote(quoteObj, container);
   }, ADVANCE_DELAY);
@@ -564,8 +569,14 @@ function typeQuote(quoteObj, container) {
   let pos = 0;
 
   function tick() {
+    if (document.hidden) {
+      lineEl.innerHTML = buildHtml(segments, pos);
+      typingTimer = null;
+      return;
+    }
     if (pos > totalLen) {
       lineEl.innerHTML = buildHtml(segments, totalLen);
+      typingTimer = null;
       return;
     }
     lineEl.innerHTML =
@@ -639,6 +650,23 @@ function showLoadError() {
   container.innerHTML =
     '<div class="paper-line current">— connection error —</div>';
 }
+
+// ── Visibility: pause when hidden, resume when visible ────────
+
+function pauseTyping() {
+  if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  if (pendingAdvanceTimer) { clearTimeout(pendingAdvanceTimer); pendingAdvanceTimer = null; }
+  // Finalize any in-progress line — strip cursor, freeze at current chars
+  document.querySelectorAll('.cursor').forEach(el => el.remove());
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    pauseTyping();
+  } else if (clockStarted) {
+    showCurrentQuote();
+  }
+});
 
 // ── Boot ──────────────────────────────────────────────────────
 
