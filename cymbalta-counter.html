@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cymbalta® Counter</title>
-<meta name="description" content="A live counter tracking how long it has been since Eli Lilly announced FDA approval of Cymbalta® for Generalized Anxiety Disorder.">
+<meta name="description" content="A live counter tracking how long it has been since the manufacturer announced FDA approval of Cymbalta® for generalized anxiety disorder.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -116,6 +116,18 @@
     color: #e0ddd5;
   }
 
+  .manufacturer-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #444;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s;
+  }
+
+  .manufacturer-link:hover {
+    text-decoration-color: #888;
+  }
+
   /* ── COUNTER ── */
   .counter-grid {
     display: flex;
@@ -207,6 +219,13 @@
     max-width: 500px;
   }
 
+  .subtext.last-approved {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    color: #4e4e5e;
+  }
+
   /* ── FOOTNOTE ── */
   .footer {
     padding: 2.5rem 2rem 3rem;
@@ -260,9 +279,9 @@
     <div class="framing-statement">
       <span class="it-has-been">It has been</span><br>
       <span class="indication">this long</span>
-      since Eli Lilly announced<br>
+      since <a href="https://investor.lilly.com/news-releases/news-release-details/fda-approves-cymbaltar-treatment-generalized-anxiety-disorder" target="_blank" rel="noopener" class="manufacturer-link">the manufacturer</a> announced<br>
       FDA approval of <span class="drug-name">Cymbalta®</span><br>
-      for Generalized Anxiety Disorder.
+      for generalized anxiety disorder.
     </div>
   </div>
 
@@ -308,6 +327,10 @@
     The clock has not stopped.
   </p>
 
+  <p class="subtext last-approved">
+    It remains the last drug approved by the FDA for generalized anxiety disorder.
+  </p>
+
 </main>
 
 <footer class="footer">
@@ -318,7 +341,7 @@
     <span class="sep">·</span>
     Cymbalta® is a registered trademark of Eli Lilly and Company.
     <br>
-    This page is not affiliated with or endorsed by Eli Lilly and Company or the FDA.
+    This page is not affiliated with or endorsed by the manufacturer or the FDA.
   </div>
 </footer>
 
