@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cymbalta® Counter</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta name="description" content="A live counter tracking how long it has been since its manufacturer announced FDA approval of Cymbalta® for generalized anxiety disorder.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
@@ -135,6 +136,11 @@
     align-items: center;
     gap: 0.6rem;
     position: relative;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .counter-unit:hover {
+    transform: translateY(-4px);
   }
 
   .counter-value {
@@ -145,16 +151,33 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
     color: #e8e4dc;
-    transition: color 0.1s;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    text-shadow: 0 0 25px rgba(232, 228, 220, 0.02);
+  }
+
+  .counter-unit:hover .counter-value {
+    color: #ffffff;
+    text-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
   }
 
   .counter-unit.years .counter-value {
     font-size: clamp(4.5rem, 12vw, 10rem);
     color: #c8b97a;
+    text-shadow: 0 0 25px rgba(200, 185, 122, 0.12);
+  }
+
+  .counter-unit.years:hover .counter-value {
+    color: #ebdca2;
+    text-shadow: 0 0 35px rgba(235, 220, 162, 0.3);
   }
 
   .counter-unit.seconds .counter-value {
     color: #7a7a9a;
+  }
+
+  .counter-unit.seconds:hover .counter-value {
+    color: #a0a0ca;
+    text-shadow: 0 0 25px rgba(160, 160, 202, 0.2);
   }
 
   .counter-label {
@@ -164,10 +187,20 @@
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: #777;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .counter-unit:hover .counter-label {
+    color: #aaa;
   }
 
   .counter-unit.years .counter-label {
     color: #9a8a4a;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .counter-unit.years:hover .counter-label {
+    color: #c8b97a;
   }
 
   /* Separators between units */
@@ -214,6 +247,72 @@
     .counter-sep { display: none; }
     .counter-grid { gap: 1.2rem; }
     .framing-below { margin-top: 2rem; }
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    width: 100%;
+    padding: 4rem 2rem 5rem;
+    background: linear-gradient(to bottom, transparent, rgba(10, 10, 15, 0.5) 30%, rgba(10, 10, 15, 0.9) 100%);
+    border-top: 1px solid rgba(200, 185, 122, 0.05); /* very soft gold border */
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .footer-primary {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.8rem;
+  }
+
+  .footer-primary a {
+    color: #9a8a4a; /* Dimmed gold */
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(154, 138, 74, 0.4);
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-bottom-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .footer-primary a:hover {
+    color: #c8b97a; /* Main gold */
+    border-bottom-color: #c8b97a;
+  }
+
+  .footer-primary .sep {
+    color: #444;
+    user-select: none;
+  }
+
+  .footer-secondary {
+    font-size: 0.7rem;
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+    color: #555;
+    max-width: 600px;
+  }
+
+  .footer-secondary p {
+    margin-bottom: 0.25rem;
+  }
+
+  .footer-secondary p:last-child {
+    margin-bottom: 0;
   }
 </style>
 </head>
@@ -269,14 +368,16 @@
 </main>
 
 <footer class="footer">
-  <div class="footnote">
-    FDA approval announced February 26, 2007.
-    <span class="sep">·</span>
-    <a href="https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2007/021427s015ltr.pdf" target="_blank" rel="noopener">FDA approval letter</a>
-    <span class="sep">·</span>
-    Cymbalta® is a registered trademark of Eli Lilly and Company.
-    <br>
-    This page is not affiliated with or endorsed by the manufacturer or the FDA.
+  <div class="footer-content">
+    <div class="footer-primary">
+      <span>FDA approval announced February 26, 2007</span>
+      <span class="sep">·</span>
+      <a href="https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2007/021427s015ltr.pdf" target="_blank" rel="noopener">FDA Approval Letter</a>
+    </div>
+    <div class="footer-secondary">
+      <p>Cymbalta® is a registered trademark of Eli Lilly and Company.</p>
+      <p>This page is not affiliated with, sponsored by, or endorsed by Eli Lilly and Company or the FDA.</p>
+    </div>
   </div>
 </footer>
 
