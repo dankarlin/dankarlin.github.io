@@ -176,7 +176,7 @@
   }
 
   .counter-unit.days .counter-value {
-    min-width: 3.2ch;
+    min-width: 2.2ch;
   }
 
   .counter-unit.seconds .counter-value {
@@ -431,7 +431,7 @@
     const seconds = Math.floor((remainder % 60000) / 1000);
 
     el.years.textContent   = years;
-    el.days.textContent    = pad(daysSinceAnniversary, 3);
+    el.days.textContent    = daysSinceAnniversary;
     el.hours.textContent   = pad(hours);
     el.minutes.textContent = pad(minutes);
 
