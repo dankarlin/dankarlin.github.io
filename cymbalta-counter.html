@@ -120,14 +120,31 @@
   }
 
   /* ── COUNTER ── */
-  .counter-grid {
+  .counter-container {
     display: flex;
-    gap: clamp(1rem, 3vw, 2.5rem);
-    align-items: flex-end;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 3rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+    width: 100%;
     position: relative;
+  }
+
+  .counter-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    position: relative;
+    width: 100%;
+  }
+
+  .years-row {
+    margin-bottom: 0.75rem;
+  }
+
+  .details-row {
+    gap: clamp(0.8rem, 2.2vw, 1.8rem);
   }
 
   .counter-unit {
@@ -145,7 +162,7 @@
 
   .counter-value {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(3.5rem, 9vw, 7.5rem);
+    font-size: clamp(2.2rem, 5.5vw, 4.5rem);
     font-weight: 700;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -164,15 +181,15 @@
   }
 
   .counter-unit.years .counter-value {
-    font-size: clamp(4.5rem, 12vw, 10rem);
+    font-size: clamp(5rem, 13vw, 11rem);
     color: #c8b97a;
-    text-shadow: 0 0 25px rgba(200, 185, 122, 0.12);
+    text-shadow: 0 0 30px rgba(200, 185, 122, 0.15);
     min-width: 2.2ch;
   }
 
   .counter-unit.years:hover .counter-value {
     color: #ebdca2;
-    text-shadow: 0 0 35px rgba(235, 220, 162, 0.3);
+    text-shadow: 0 0 40px rgba(235, 220, 162, 0.35);
   }
 
   .counter-unit.days .counter-value {
@@ -203,7 +220,9 @@
   }
 
   .counter-unit.years .counter-label {
+    font-size: clamp(0.7rem, 1.4vw, 0.85rem);
     color: #9a8a4a;
+    letter-spacing: 0.3em;
     transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -214,10 +233,10 @@
   /* Separators between units */
   .counter-sep {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 4rem);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
     color: #333;
     line-height: 1;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.1rem;
     user-select: none;
   }
 
@@ -253,7 +272,7 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .counter-sep { display: none; }
-    .counter-grid { gap: 1.2rem; }
+    .details-row { gap: 1rem; }
     .framing-below { margin-top: 2rem; }
   }
 
@@ -335,38 +354,40 @@
 
   <div class="framing-above">It has been</div>
 
-  <div class="counter-grid">
-    <div class="counter-unit years">
-      <div class="counter-value" id="years">—</div>
-      <div class="counter-label">Years</div>
+  <div class="counter-container">
+    <div class="counter-row years-row">
+      <div class="counter-unit years">
+        <div class="counter-value" id="years">—</div>
+        <div class="counter-label">Years</div>
+      </div>
     </div>
 
-    <div class="counter-sep">·</div>
+    <div class="counter-row details-row">
+      <div class="counter-unit days">
+        <div class="counter-value" id="days">—</div>
+        <div class="counter-label">Days</div>
+      </div>
 
-    <div class="counter-unit days">
-      <div class="counter-value" id="days">—</div>
-      <div class="counter-label">Days</div>
-    </div>
+      <div class="counter-sep">·</div>
 
-    <div class="counter-sep">·</div>
+      <div class="counter-unit hours">
+        <div class="counter-value" id="hours">—</div>
+        <div class="counter-label">Hours</div>
+      </div>
 
-    <div class="counter-unit hours">
-      <div class="counter-value" id="hours">—</div>
-      <div class="counter-label">Hours</div>
-    </div>
+      <div class="counter-sep">·</div>
 
-    <div class="counter-sep">·</div>
+      <div class="counter-unit minutes">
+        <div class="counter-value" id="minutes">—</div>
+        <div class="counter-label">Minutes</div>
+      </div>
 
-    <div class="counter-unit minutes">
-      <div class="counter-value" id="minutes">—</div>
-      <div class="counter-label">Minutes</div>
-    </div>
+      <div class="counter-sep">·</div>
 
-    <div class="counter-sep">·</div>
-
-    <div class="counter-unit seconds">
-      <div class="counter-value" id="seconds">—</div>
-      <div class="counter-label">Seconds</div>
+      <div class="counter-unit seconds">
+        <div class="counter-value" id="seconds">—</div>
+        <div class="counter-label">Seconds</div>
+      </div>
     </div>
   </div>
 
