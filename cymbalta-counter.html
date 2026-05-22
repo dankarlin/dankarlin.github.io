@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cymbalta® Counter</title>
-<meta name="description" content="A live counter tracking how long it has been since the manufacturer announced FDA approval of Cymbalta® for generalized anxiety disorder.">
+<meta name="description" content="A live counter tracking how long it has been since its manufacturer announced FDA approval of Cymbalta® for generalized anxiety disorder.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -78,42 +78,32 @@
   }
 
   /* ── FRAMING TEXT ── */
-  .framing {
-    max-width: 680px;
-    margin-bottom: 4rem;
-    position: relative;
-  }
-
-  .framing-upper {
+  .framing-above {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-size: clamp(0.7rem, 1.4vw, 0.82rem);
     font-weight: 500;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #444;
-    margin-bottom: 1.5rem;
+    color: #383838;
+    margin-bottom: 2.5rem;
   }
 
-  .framing-statement {
+  .framing-below {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .framing-below .context {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
     font-weight: 400;
-    line-height: 1.45;
-    color: #9a968e;
+    line-height: 1.55;
+    color: #6a6660;
   }
 
-  .framing-statement .it-has-been {
-    color: #555;
-    font-style: italic;
-  }
-
-  .framing-statement .drug-name {
+  .framing-below .drug-name {
     color: #c8b97a;
     font-style: normal;
-  }
-
-  .framing-statement .indication {
-    color: #e0ddd5;
   }
 
   .manufacturer-link {
@@ -261,7 +251,7 @@
   @media (max-width: 600px) {
     .counter-sep { display: none; }
     .counter-grid { gap: 1.2rem; }
-    .framing { margin-bottom: 2.5rem; }
+    .framing-below { margin-top: 2rem; }
   }
 </style>
 </head>
@@ -274,16 +264,7 @@
 
 <main class="main">
 
-  <div class="framing">
-    <div class="framing-upper">A live measurement</div>
-    <div class="framing-statement">
-      <span class="it-has-been">It has been</span><br>
-      <span class="indication">this long</span>
-      since <a href="https://investor.lilly.com/news-releases/news-release-details/fda-approves-cymbaltar-treatment-generalized-anxiety-disorder" target="_blank" rel="noopener" class="manufacturer-link">the manufacturer</a> announced<br>
-      FDA approval of <span class="drug-name">Cymbalta®</span><br>
-      for generalized anxiety disorder.
-    </div>
-  </div>
+  <div class="framing-above">It has been</div>
 
   <div class="counter-grid">
     <div class="counter-unit years">
@@ -318,6 +299,10 @@
       <div class="counter-value" id="seconds">—</div>
       <div class="counter-label">Seconds</div>
     </div>
+  </div>
+
+  <div class="framing-below">
+    <p class="context">since <a href="https://investor.lilly.com/news-releases/news-release-details/fda-approves-cymbaltar-treatment-generalized-anxiety-disorder" target="_blank" rel="noopener" class="manufacturer-link">its manufacturer</a> announced FDA approval of <span class="drug-name">Cymbalta®</span> for generalized anxiety disorder.</p>
   </div>
 
   <div class="divider"></div>
