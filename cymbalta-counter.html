@@ -153,6 +153,9 @@
     color: #e8e4dc;
     transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     text-shadow: 0 0 25px rgba(232, 228, 220, 0.02);
+    display: inline-flex;
+    justify-content: center;
+    min-width: 2.2ch;
   }
 
   .counter-unit:hover .counter-value {
@@ -164,11 +167,16 @@
     font-size: clamp(4.5rem, 12vw, 10rem);
     color: #c8b97a;
     text-shadow: 0 0 25px rgba(200, 185, 122, 0.12);
+    min-width: 2.2ch;
   }
 
   .counter-unit.years:hover .counter-value {
     color: #ebdca2;
     text-shadow: 0 0 35px rgba(235, 220, 162, 0.3);
+  }
+
+  .counter-unit.days .counter-value {
+    min-width: 3.2ch;
   }
 
   .counter-unit.seconds .counter-value {
