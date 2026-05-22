@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Literature Clock — Typewriter</title>
+<meta name="description" content="A literary clock: time told through quotes from classic literature, displayed on a vintage typewriter.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #100c07;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 70% at 50% 65%, #241508 0%, #100c07 100%);
+  font-family: 'Special Elite', 'American Typewriter', 'Courier New', monospace;
+}
+
+/* ── Layout ── */
+
+.scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  gap: 0;
+}
+
+.typewriter-wrap {
+  position: relative;
+  width: min(900px, 96vw);
+  aspect-ratio: 900 / 760; /* explicit height so child % values resolve correctly */
+}
+
+.typewriter-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* SVG viewBox is 900 × 760 (y: -160 → 600) */
+}
+
+/* ── Paper overlay ──
+   SVG viewBox: 0 -160 900 760  (visible y range: -160 to 600)
+   Paper x=238 w=424; platen top arc y=220
+   Platen top relative to viewBox: (220 − (−160)) / 760 = 380/760 = 50%
+   So overlay runs from top:0 to bottom:50% (= exactly the platen line)
+*/
+.paper-overlay {
+  position: absolute;
+  left: 26.44%;
+  top: 0;
+  width: 47.11%;
+  bottom: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  /* subtle horizontal rules matching line height */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.6em - 1px),
+    rgba(160, 140, 110, 0.12) calc(1.6em - 1px),
+    rgba(160, 140, 110, 0.12) 1.6em
+  );
+  background-size: 100% 1.6em;
+  background-position: 0 0.1em;
+}
+
+/* Anchor to the bottom of the overlay so text grows upward as quotes accumulate.
+   Overflow is clipped by parent's overflow:hidden at the platen line. */
+.paper-lines-container {
+  position: absolute;
+  bottom: 8px;
+  left: 14px;
+  right: 14px;
+  /* paper-advance animation target */
+}
+
+.paper-lines-container.advancing {
+  animation: paperAdvance 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes paperAdvance {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-13px); }
+  65%  { transform: translateY(-13px); }
+  100% { transform: translateY(0); }
+}
+
+/* ── Paper lines ── */
+
+.paper-line {
+  font-family: 'Special Elite', 'American Typewriter', 'Courier New', monospace;
+  font-size: clamp(10px, 1.35vw, 14px);
+  line-height: 1.6;
+  color: #1e1509;
+  word-break: break-word;
+  transition: opacity 0.4s ease;
+}
+
+.paper-line.old   { opacity: 0.38; }
+.paper-line.older { opacity: 0.18; }
+
+.paper-line em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(30, 21, 9, 0.55);
+}
+
+
+/* ── Cursor ── */
+.cursor {
+  display: inline;
+  animation: cursorBlink 0.75s step-end infinite;
+  opacity: 1;
+}
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Status bar ── */
+.status-bar {
+  margin-top: -2px;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: clamp(9px, 1vw, 11px);
+  color: rgba(210, 175, 115, 0.3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  height: 1.6em;
+  line-height: 1.6em;
+  pointer-events: none;
+}
+
+/* ── Loading dots ── */
+.loading-text { opacity: 0.5; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="typewriter-wrap">
+
+    <!-- ════════════════════════════════════════════════
+         SVG TYPEWRITER ILLUSTRATION
+         ViewBox: 900 × 700
+         ════════════════════════════════════════════════ -->
+    <svg class="typewriter-svg" viewBox="0 -160 900 760"
+         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <!-- Body gradient: top lighter, bottom very dark -->
+        <linearGradient id="gBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#2c2c2c"/>
+          <stop offset="45%"  stop-color="#1a1a1a"/>
+          <stop offset="100%" stop-color="#0e0e0e"/>
+        </linearGradient>
+        <!-- Carriage gradient -->
+        <linearGradient id="gCarriage" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#363636"/>
+          <stop offset="100%" stop-color="#1e1e1e"/>
+        </linearGradient>
+        <!-- Platen: darker cylinder -->
+        <linearGradient id="gPlaten" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#484848"/>
+          <stop offset="35%"  stop-color="#323232"/>
+          <stop offset="100%" stop-color="#1a1a1a"/>
+        </linearGradient>
+        <!-- Chrome hardware -->
+        <linearGradient id="gChrome" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#d8d8d8"/>
+          <stop offset="30%"  stop-color="#b0b0b0"/>
+          <stop offset="68%"  stop-color="#787878"/>
+          <stop offset="100%" stop-color="#b8b8b8"/>
+        </linearGradient>
+        <!-- Chrome (horizontal) -->
+        <linearGradient id="gChromeH" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#c0c0c0"/>
+          <stop offset="50%"  stop-color="#e8e8e8"/>
+          <stop offset="100%" stop-color="#c0c0c0"/>
+        </linearGradient>
+        <!-- Platen knob -->
+        <radialGradient id="gKnob" cx="35%" cy="30%" r="65%">
+          <stop offset="0%"   stop-color="#c8c8c8"/>
+          <stop offset="60%"  stop-color="#888"/>
+          <stop offset="100%" stop-color="#555"/>
+        </radialGradient>
+        <!-- Paper: warm cream with slightly darker edges -->
+        <linearGradient id="gPaper" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#d8d2c0"/>
+          <stop offset="5%"   stop-color="#f4efe0"/>
+          <stop offset="95%"  stop-color="#f4efe0"/>
+          <stop offset="100%" stop-color="#d8d2c0"/>
+        </linearGradient>
+        <!-- Paper top fade (slight curl at top edge) -->
+        <linearGradient id="gPaperTop" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#ccc6b0" stop-opacity="0.5"/>
+          <stop offset="8%"   stop-color="#f4efe0" stop-opacity="0"/>
+        </linearGradient>
+        <!-- Typewriter drop shadow -->
+        <filter id="fShadow" x="-12%" y="-8%" width="124%" height="128%">
+          <feDropShadow dx="0" dy="14" stdDeviation="22"
+                        flood-color="#000" flood-opacity="0.75"/>
+        </filter>
+        <!-- Key inner shadow -->
+        <filter id="fKeyInner" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1" stdDeviation="1.5"
+                        flood-color="#000" flood-opacity="0.6"/>
+        </filter>
+        <!-- Paper clip -->
+        <clipPath id="cPaper">
+          <rect x="238" y="0" width="424" height="290"/>
+        </clipPath>
+      </defs>
+
+      <!-- ── Whole machine with drop shadow ── -->
+      <g filter="url(#fShadow)">
+
+        <!-- ═══════════════════════════════════
+             PAPER (drawn first so platen covers it)
+             ═══════════════════════════════════ -->
+
+        <!-- Paper sheet — extends well above viewBox so no top edge is visible -->
+        <rect x="238" y="-400" width="424" height="686" fill="url(#gPaper)"/>
+        <!-- Paper left edge shadow line -->
+        <rect x="238" y="-400" width="5"   height="686" fill="#ccc5ae"/>
+        <!-- Paper right edge shadow line -->
+        <rect x="657" y="-400" width="5"   height="686" fill="#ccc5ae"/>
+
+        <!-- ── Paper guide fingers (metal clips holding paper) ── -->
+        <!-- Left clip post -->
+        <rect x="226" y="35" width="14" height="190" rx="7" fill="#b0b0b0"/>
+        <rect x="222" y="29" width="22" height="20"  rx="5" fill="#c8c8c8"/>
+        <rect x="225" y="32" width="16" height="10"  rx="3" fill="#e0e0e0" opacity="0.6"/>
+        <!-- Right clip post -->
+        <rect x="660" y="35" width="14" height="190" rx="7" fill="#b0b0b0"/>
+        <rect x="656" y="29" width="22" height="20"  rx="5" fill="#c8c8c8"/>
+        <rect x="659" y="32" width="16" height="10"  rx="3" fill="#e0e0e0" opacity="0.6"/>
+
+        <!-- ═══════════════════════════════════
+             CARRIAGE ASSEMBLY
+             ═══════════════════════════════════ -->
+
+        <!-- Carriage body bar (spans wide) -->
+        <rect x="28"  y="210" width="844" height="92"
+              rx="9" fill="url(#gCarriage)"/>
+        <!-- Carriage top edge highlight -->
+        <rect x="28"  y="210" width="844" height="7"
+              rx="3" fill="#404040"/>
+
+        <!-- ═══════════════════════════════════
+             PLATEN CYLINDER
+             (drawn after paper — covers bottom of paper)
+             ═══════════════════════════════════ -->
+
+        <!-- Platen body -->
+        <rect x="58" y="220" width="784" height="66" fill="url(#gPlaten)"/>
+        <!-- Platen top arc -->
+        <ellipse cx="450" cy="220" rx="392" ry="22" fill="#484848"/>
+        <!-- Platen top highlight sheen -->
+        <ellipse cx="450" cy="217" rx="350" ry="12" fill="#555" opacity="0.7"/>
+        <ellipse cx="380" cy="214" rx="130" ry="6"  fill="#686868" opacity="0.45"/>
+        <!-- Platen bottom arc (front face curve) -->
+        <ellipse cx="450" cy="286" rx="392" ry="22" fill="#181818"/>
+
+        <!-- ── Paper bail (chrome rod in front of platen) ── -->
+        <rect x="220" y="278" width="460" height="11"
+              rx="5.5" fill="url(#gChrome)"/>
+        <!-- bail shadow -->
+        <rect x="220" y="288" width="460" height="4"
+              rx="2" fill="#000" opacity="0.35"/>
+
+        <!-- ── Carriage chrome trim rail (bottom of carriage) ── -->
+        <rect x="28" y="294" width="844" height="9"
+              rx="4" fill="url(#gChrome)"/>
+
+        <!-- ── Left platen knob ── -->
+        <circle cx="46"  cy="253" r="32" fill="#3a3a3a"/>
+        <circle cx="46"  cy="253" r="27" fill="url(#gKnob)"/>
+        <circle cx="46"  cy="253" r="17" fill="#5a5a5a"/>
+        <circle cx="46"  cy="253" r="9"  fill="#404040"/>
+        <ellipse cx="40" cy="246" rx="7" ry="4" fill="#d8d8d8" opacity="0.4"/>
+
+        <!-- ── Right platen knob ── -->
+        <circle cx="854" cy="253" r="32" fill="#3a3a3a"/>
+        <circle cx="854" cy="253" r="27" fill="url(#gKnob)"/>
+        <circle cx="854" cy="253" r="17" fill="#5a5a5a"/>
+        <circle cx="854" cy="253" r="9"  fill="#404040"/>
+        <ellipse cx="848" cy="246" rx="7" ry="4" fill="#d8d8d8" opacity="0.4"/>
+
+        <!-- ── Carriage return lever (right side) ── -->
+        <g transform="rotate(-18, 842, 228)">
+          <rect x="834" y="200" width="10" height="52" rx="5" fill="#909090"/>
+          <circle cx="839" cy="198" r="11" fill="#a8a8a8"/>
+          <circle cx="839" cy="198" r="7"  fill="#888"/>
+        </g>
+
+        <!-- ── Margin release tab (left, decorative) ── -->
+        <rect x="55" y="215" width="7" height="28" rx="3" fill="#666"/>
+
+        <!-- ═══════════════════════════════════
+             MAIN BODY
+             ═══════════════════════════════════ -->
+
+        <!-- Body shell -->
+        <rect x="88"  y="286" width="724" height="384"
+              rx="22" fill="url(#gBody)"/>
+        <!-- Body top edge highlight -->
+        <rect x="88"  y="286" width="724" height="10"
+              rx="5" fill="#303030"/>
+
+        <!-- Front name-plate panel -->
+        <rect x="108" y="291" width="684" height="28"
+              rx="4" fill="#1c1c1c"/>
+        <text x="450" y="309" text-anchor="middle"
+              font-family="Georgia, 'Times New Roman', serif"
+              font-size="13.5" font-weight="bold"
+              letter-spacing="7" fill="#525252">REMINGTON</text>
+
+        <!-- Key well (the recessed area housing the keyboard) -->
+        <rect x="103" y="316" width="694" height="352"
+              rx="18" fill="#111"/>
+        <!-- Key well inner edge highlight -->
+        <rect x="103" y="316" width="694" height="6"
+              rx="3" fill="#1e1e1e"/>
+
+        <!-- Key rows (generated by JS, grouped here) -->
+        <g id="keyGroup"></g>
+
+        <!-- ── Spacebar ── -->
+        <rect x="198" y="558" width="504" height="42"
+              rx="21" fill="#1c1c1c" stroke="#363636" stroke-width="1.5"/>
+        <rect x="203" y="562" width="494" height="30"
+              rx="17" fill="#161616"/>
+        <!-- Spacebar top face highlight -->
+        <rect x="222" y="563" width="456" height="9"
+              rx="4" fill="#222"/>
+
+        <!-- ── Side body panels (slight raised detail) ── -->
+        <!-- Left -->
+        <rect x="88"  y="310" width="18" height="320"
+              rx="5" fill="#222"/>
+        <!-- Right -->
+        <rect x="794" y="310" width="18" height="320"
+              rx="5" fill="#222"/>
+
+        <!-- ── Bottom base / lip ── -->
+        <rect x="88"  y="646" width="724" height="26"
+              rx="13" fill="#1c1c1c"/>
+        <!-- Base highlight -->
+        <rect x="95"  y="648" width="710" height="8"
+              rx="4" fill="#242424"/>
+
+        <!-- ── Rubber feet ── -->
+        <ellipse cx="148" cy="667" rx="28" ry="9" fill="#0d0d0d"/>
+        <ellipse cx="752" cy="667" rx="28" ry="9" fill="#0d0d0d"/>
+
+      </g><!-- end shadow group -->
+
+      <!-- ── Tab stop bar (above carriage, decorative) ── -->
+      <rect x="80" y="206" width="740" height="6"
+            rx="3" fill="#2a2a2a" opacity="0.8"/>
+
+    </svg>
+
+    <!-- ════════════════════════════════════════════════
+         PAPER TEXT OVERLAY
+         ════════════════════════════════════════════════ -->
+    <div class="paper-overlay" id="paperOverlay" aria-live="polite">
+      <div class="paper-lines-container" id="paperContainer">
+        <div class="paper-line loading-text" id="loadingLine">
+          loading<span id="loadDots">…</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.typewriter-wrap -->
+
+  <!-- Time display -->
+  <div class="status-bar" id="statusBar"></div>
+
+</div><!-- /.scene -->
+
+<script>
+// ============================================================
+//  LITERATURE CLOCK — TYPEWRITER WEB
+//  Quote data: github.com/JohannesNE/literature-clock
+// ============================================================
+
+const CSV_URL =
+  'https://raw.githubusercontent.com/JohannesNE/literature-clock/master/litclock_annotated.csv';
+
+const CHAR_DELAY_BASE = 38;   // ms per character, base
+const CHAR_DELAY_JITTER = 44; // random extra ms
+const ADVANCE_DELAY = 600;    // ms for paper-advance animation
+const MAX_OLD_LINES = 3;      // non-current quote blocks to keep
+
+let quotesMap = {};           // { 'HH:MM': [ {time, quote, source}, ... ] }
+let typingTimer = null;
+let clockStarted = false;
+
+// ── Generate key circles ─────────────────────────────────────
+
+(function generateKeys() {
+  const rows = [
+    { y: 352, count: 13, x0: 92,  dx: 56.5 },
+    { y: 406, count: 13, x0: 120, dx: 56.5 },
+    { y: 459, count: 12, x0: 148, dx: 56.5 },
+    { y: 512, count: 11, x0: 175, dx: 56.5 },
+  ];
+
+  let svg = '';
+  for (const row of rows) {
+    for (let i = 0; i < row.count; i++) {
+      const x = row.x0 + i * row.dx;
+      const y = row.y;
+      // Outer ring, chrome bezel, glass face, highlight
+      svg += `<circle cx="${x}" cy="${y}" r="23" fill="#1e1e1e" stroke="#383838" stroke-width="1.5"/>`;
+      svg += `<circle cx="${x}" cy="${y}" r="18" fill="#161616" stroke="#2a2a2a" stroke-width="1"/>`;
+      svg += `<circle cx="${x}" cy="${y}" r="13.5" fill="#121212"/>`;
+      svg += `<ellipse cx="${x - 4}" cy="${y - 4}" rx="5.5" ry="3.5" fill="rgba(255,255,255,0.065)"/>`;
+    }
+  }
+  document.getElementById('keyGroup').innerHTML = svg;
+})();
+
+// ── CSV fetch & parse ─────────────────────────────────────────
+
+async function loadCSV() {
+  startLoadingAnimation();
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    parseCSV(text);
+    startClock();
+  } catch (err) {
+    console.error('Literature clock load failed:', err);
+    showLoadError();
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n');
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    // Format: time|time_natural|quote|title|author
+    const p = line.split('|');
+    if (p.length < 4) continue;
+    const time   = p[0].trim();
+    const quote  = p[2].trim();
+    const title  = (p[3] || '').trim();
+    const author = (p[4] || '').trim();
+    if (!/^\d{2}:\d{2}$/.test(time) || !quote) continue;
+    const source = author ? `${title} — ${author}` : title;
+    if (!quotesMap[time]) quotesMap[time] = [];
+    quotesMap[time].push({ time, quote, source });
+  }
+}
+
+// ── Clock management ──────────────────────────────────────────
+
+function startClock() {
+  clockStarted = true;
+  // Clear loading state before first quote
+  document.getElementById('paperContainer').innerHTML = '';
+  showCurrentQuote();
+
+  // Fire again at the next exact minute boundary
+  const now = new Date();
+  const msToNextMinute =
+    (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+  setTimeout(() => {
+    showCurrentQuote();
+    setInterval(showCurrentQuote, 60_000);
+  }, msToNextMinute);
+}
+
+function timeKey(d = new Date()) {
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function pickQuote(key) {
+  const list = quotesMap[key];
+  if (!list || !list.length) return null;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function showCurrentQuote() {
+  const key   = timeKey();
+  const quote = pickQuote(key);
+  updateStatusBar(key);
+  if (quote) advancePaper(quote);
+}
+
+// ── Paper advance + typing ────────────────────────────────────
+
+function advancePaper(quoteObj) {
+  if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+
+  const container = document.getElementById('paperContainer');
+
+  // Animate the paper feeding up
+  container.classList.add('advancing');
+  container.addEventListener('animationend', () => {
+    container.classList.remove('advancing');
+  }, { once: true });
+
+  // After animation starts, age the existing lines and add new one
+  setTimeout(() => {
+    ageLines(container);
+    typeQuote(quoteObj, container);
+  }, ADVANCE_DELAY);
+}
+
+function ageLines(container) {
+  // current → old
+  container.querySelectorAll('.paper-line.current').forEach(el => {
+    el.classList.remove('current');
+    el.classList.add('old');
+  });
+  // old → older (dimmer still)
+  container.querySelectorAll('.paper-line.old').forEach(el => {
+    el.classList.add('older');
+  });
+  // Prune: keep only MAX_OLD_LINES aged block pairs
+  pruneOldLines(container);
+}
+
+function pruneOldLines(container) {
+  const lines = Array.from(
+    container.querySelectorAll('.paper-line:not(.current)')
+  );
+  if (lines.length > MAX_OLD_LINES * 2) {
+    const excess = lines.length - MAX_OLD_LINES * 2;
+    for (let i = 0; i < excess; i++) lines[i].remove();
+  }
+}
+
+function typeQuote(quoteObj, container) {
+  const segments  = parseSegments(quoteObj.quote);
+  const totalLen  = segments.reduce((s, seg) => s + seg.text.length, 0);
+
+  const lineEl = document.createElement('div');
+  lineEl.className = 'paper-line current';
+  lineEl.innerHTML = '<span class="cursor">|</span>';
+  container.appendChild(lineEl);
+
+  let pos = 0;
+
+  function tick() {
+    if (pos > totalLen) {
+      lineEl.innerHTML = buildHtml(segments, totalLen);
+      return;
+    }
+    lineEl.innerHTML =
+      buildHtml(segments, pos) + '<span class="cursor">|</span>';
+    pos++;
+    const delay = CHAR_DELAY_BASE + Math.random() * CHAR_DELAY_JITTER;
+    typingTimer = setTimeout(tick, delay);
+  }
+
+  tick();
+}
+
+// ── Segment helpers ───────────────────────────────────────────
+
+function parseSegments(html) {
+  const segments = [];
+  const re = /<em>([\s\S]*?)<\/em>/g;
+  let last = 0, m;
+  while ((m = re.exec(html)) !== null) {
+    if (m.index > last)
+      segments.push({ text: html.slice(last, m.index), em: false });
+    segments.push({ text: m[1], em: true });
+    last = m.index + m[0].length;
+  }
+  if (last < html.length)
+    segments.push({ text: html.slice(last), em: false });
+  return segments;
+}
+
+function buildHtml(segments, charCount) {
+  let html = '', rem = charCount;
+  for (const seg of segments) {
+    if (rem <= 0) break;
+    const slice   = seg.text.slice(0, rem);
+    const escaped = slice
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    html += seg.em ? `<em>${escaped}</em>` : escaped;
+    rem -= seg.text.length;
+  }
+  return html;
+}
+
+// ── UI helpers ────────────────────────────────────────────────
+
+function updateStatusBar(key) {
+  const bar = document.getElementById('statusBar');
+  if (!bar) return;
+  const [hStr, mStr] = key.split(':');
+  const h    = parseInt(hStr, 10);
+  const h12  = ((h + 11) % 12 + 1);
+  const ampm = h < 12 ? 'AM' : 'PM';
+  bar.textContent = `${h12}:${mStr} ${ampm}`;
+}
+
+let loadDotsTimer;
+function startLoadingAnimation() {
+  const dots = document.getElementById('loadDots');
+  if (!dots) return;
+  let n = 1;
+  loadDotsTimer = setInterval(() => {
+    dots.textContent = '…'.padEnd(n, '.');  // subtle
+    n = (n % 3) + 1;
+  }, 500);
+}
+
+function showLoadError() {
+  clearInterval(loadDotsTimer);
+  const container = document.getElementById('paperContainer');
+  container.innerHTML =
+    '<div class="paper-line current">— connection error —</div>';
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+
+loadCSV();
+</script>
+</body>
+</html>
