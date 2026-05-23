@@ -150,6 +150,14 @@ body {
 
 /* ── Loading dots ── */
 .loading-text { opacity: 0.5; font-style: italic; }
+
+/* ── Keyboard Interaction ── */
+.keycap {
+  transition: transform 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.keycap.active {
+  transform: translateY(4px);
+}
 </style>
 </head>
 <body>
@@ -580,9 +588,11 @@ body {
         <circle cx="613" cy="598" r="3" fill="#222"/>
         
         <!-- Spacebar itself -->
-        <rect x="198" y="558" width="504" height="34" rx="17" fill="url(#gBlackKey)" stroke="url(#gChrome)" stroke-width="1.5" filter="url(#fShadow)"/>
-        <rect x="204" y="561" width="492" height="10" rx="5" fill="rgba(255, 255, 255, 0.08)"/>
-        <ellipse cx="450" cy="564" rx="200" ry="4" fill="rgba(255,255,255,0.15)"/>
+        <g class="keycap" id="key-SPACE" data-key=" ">
+          <rect x="198" y="558" width="504" height="34" rx="17" fill="url(#gBlackKey)" stroke="url(#gChrome)" stroke-width="1.5" filter="url(#fShadow)"/>
+          <rect x="204" y="561" width="492" height="10" rx="5" fill="rgba(255, 255, 255, 0.08)"/>
+          <ellipse cx="450" cy="564" rx="200" ry="4" fill="rgba(255,255,255,0.15)"/>
+        </g>
 
         <!-- ── Casing bottom base plates ── -->
         <rect x="88"  y="646" width="724" height="26" rx="13" fill="#111115" stroke="#000" stroke-width="1"/>
@@ -669,6 +679,13 @@ let pendingAdvanceTimer = null;
       svg += `<rect x="${x - 2.5}" y="${y}" width="5" height="30" fill="url(#gChrome)" stroke="#111827" stroke-width="0.5"/>`;
       svg += `<rect x="${x - 1.5}" y="${y}" width="1" height="30" fill="#ffffff" opacity="0.4"/>`;
 
+      // Open interactive keycap group
+      let keyId = `key-${char.toUpperCase()}`;
+      if (char === 'SHIFT') {
+        keyId = `key-SHIFT-${i === 0 ? 'L' : 'R'}`;
+      }
+      svg += `<g class="keycap" id="${keyId}" data-key="${char}" style="cursor: pointer;">`;
+
       // Outer bezel base shadow
       svg += `<circle cx="${x}" cy="${y + 2.5}" r="21" fill="#000" opacity="0.4"/>`;
       // Chrome metal ring outer ring
@@ -691,6 +708,9 @@ let pendingAdvanceTimer = null;
       // Spherical glass reflections
       svg += `<ellipse cx="${x - 4}" cy="${y - 4}" rx="8" ry="4.5" fill="rgba(255, 255, 255, 0.16)"/>`;
       svg += `<path d="M ${x - 11} ${y + 8} A 13.5 13.5 0 0 0 ${x + 11} ${y + 8}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.2"/>`;
+
+      // Close keycap group
+      svg += `</g>`;
     }
   }
   document.getElementById('keyGroup').innerHTML = svg;
@@ -760,7 +780,7 @@ function pickQuote(key) {
 }
 
 function showCurrentQuote() {
-  if (document.hidden) return;
+  if (document.hidden || currentMode === 'MANUAL') return;
   const key   = timeKey();
   const quote = pickQuote(key);
   updateStatusBar(key);
@@ -923,6 +943,140 @@ document.addEventListener('visibilitychange', () => {
     pauseTyping();
   } else if (clockStarted) {
     showCurrentQuote();
+  }
+});
+
+// ── Manual Typing & Keyboard Interaction State Machine ────────
+
+let currentMode = 'AUTO'; // 'AUTO' | 'MANUAL'
+let manualText = '';
+let manualTimeout = null;
+let currentManualLine = null;
+
+function triggerKeypress(key, keycapEl) {
+  // 1. Depress the keycap visually if it exists
+  if (keycapEl) {
+    keycapEl.classList.add('active');
+    setTimeout(() => keycapEl.classList.remove('active'), 90);
+  }
+
+  // 2. Clear any active manual timeout
+  clearTimeout(manualTimeout);
+
+  // 3. Transition to MANUAL if in AUTO
+  if (currentMode === 'AUTO') {
+    currentMode = 'MANUAL';
+    pauseTyping(); // Pauses clock typing animations
+
+    // Age existing lines
+    const container = document.getElementById('paperContainer');
+    ageLines(container);
+
+    // Create a new fresh manual typing line
+    currentManualLine = document.createElement('div');
+    currentManualLine.className = 'paper-line current manual-line';
+    currentManualLine.innerHTML = '<span class="cursor">|</span>';
+    container.appendChild(currentManualLine);
+    manualText = '';
+  }
+
+  // 4. Process character/special key actions
+  if (key === '←') {
+    // Backspace
+    manualText = manualText.slice(0, -1);
+  } else if (key === '↩') {
+    // Enter (new line)
+    const container = document.getElementById('paperContainer');
+    ageLines(container);
+    
+    currentManualLine = document.createElement('div');
+    currentManualLine.className = 'paper-line current manual-line';
+    currentManualLine.innerHTML = '<span class="cursor">|</span>';
+    container.appendChild(currentManualLine);
+    manualText = '';
+  } else if (key === 'SHIFT' || key === 'LOCK' || key === 'STARTER') {
+    // Functional keys, don't type their label but reset timer
+  } else if (key.length === 1) {
+    // Standard character
+    manualText += key;
+  }
+
+  // 5. Update display with cursor
+  if (currentManualLine) {
+    const escaped = manualText
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    currentManualLine.innerHTML = escaped + '<span class="cursor">|</span>';
+  }
+
+  // 6. Reset manual idle timer
+  manualTimeout = setTimeout(() => {
+    resumeAutoMode();
+  }, 10000);
+}
+
+function resumeAutoMode() {
+  currentMode = 'AUTO';
+  
+  // Clean up any remaining manual cursors
+  document.querySelectorAll('.manual-line .cursor').forEach(el => el.remove());
+  
+  // Re-trigger standard automatic time quote
+  if (clockStarted && !document.hidden) {
+    showCurrentQuote();
+  }
+}
+
+// ── Event Routing for clicks ──
+document.getElementById('keyGroup').addEventListener('mousedown', (e) => {
+  const keycap = e.target.closest('.keycap');
+  if (keycap) {
+    const key = keycap.getAttribute('data-key');
+    triggerKeypress(key, keycap);
+  }
+});
+
+const spacebarEl = document.getElementById('key-SPACE');
+if (spacebarEl) {
+  spacebarEl.addEventListener('mousedown', (e) => {
+    triggerKeypress(' ', spacebarEl);
+  });
+}
+
+// ── Event Routing for physical keyboards ──
+window.addEventListener('keydown', (e) => {
+  let key = e.key;
+  if (key === 'Escape' || e.metaKey || e.ctrlKey || e.altKey) return;
+
+  let normKey = key.toUpperCase();
+  if (normKey === ' ') normKey = 'SPACE';
+  if (normKey === 'ENTER') normKey = '↩';
+  if (normKey === 'BACKSPACE') normKey = '←';
+
+  // Find closest matching keycap element
+  let keycap = null;
+  if (normKey === 'SPACE') {
+    keycap = document.getElementById('key-SPACE');
+  } else {
+    // Match normal character or Shift keys
+    keycap = document.getElementById(`key-${normKey}`);
+    if (!keycap && e.shiftKey) {
+      // Fallback to shift-L
+      keycap = document.getElementById('key-SHIFT-L');
+    }
+  }
+
+  if (keycap) {
+    e.preventDefault();
+    const dataKey = keycap.getAttribute('data-key');
+    // If standard character, type what the user pressed physically (case sensitive!)
+    const typeVal = (key.length === 1) ? key : dataKey;
+    triggerKeypress(typeVal, keycap);
+  } else if (key.length === 1) {
+    // If no corresponding visual key, still let the character type directly onto the paper!
+    e.preventDefault();
+    triggerKeypress(key, null);
   }
 });
 
