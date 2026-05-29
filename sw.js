@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dankarlin-v1.0.0';
+const CACHE_NAME = 'dankarlin-v1.0.1';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -21,18 +21,35 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Fetch event - serve from cache when possible
+// Fetch event - Stale-While-Revalidate caching strategy for faster subsequent loads and background updates
 self.addEventListener('fetch', event => {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+      .then(cachedResponse => {
+        const networkFetch = fetch(event.request)
+          .then(networkResponse => {
+            // Update cache with the new network response
+            if (networkResponse && networkResponse.status === 200) {
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            }
+            return networkResponse;
+          })
+          .catch(() => {
+            // Fallback to cache if network fails
+            return cachedResponse;
+          });
+
+        // Return cached response immediately if we have it, otherwise wait for network
+        return cachedResponse || networkFetch;
+      })
   );
 });
 
