@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twin Awakenings: Psychedelics & AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    color: #e0ddd5;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 30% 50%, rgba(138, 43, 226, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 50%, rgba(0, 200, 255, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 .psy { color: #c084fc; }
+  .hero h1 .ai { color: #67e8f9; }
+  .hero h1 .amp { color: #555; font-style: italic; }
+
+  .hero .subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: #888;
+    max-width: 600px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    animation: bobDown 2s ease-in-out infinite;
+    color: #555;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  @keyframes bobDown {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(8px); opacity: 1; }
+  }
+
+  /* ── TIMELINE ── */
+  .timeline-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    position: relative;
+  }
+
+  .era {
+    margin-bottom: 6rem;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .era.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .era-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .era-date {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: #666;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+  }
+
+  .era-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
+
+  .era-essay {
+    max-width: 680px;
+    margin: 0 auto;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #999;
+    font-weight: 300;
+  }
+
+  .era-essay em {
+    color: #bbb;
+    font-style: italic;
+  }
+
+  /* ── DUAL CARDS ── */
+  .dual-track {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (max-width: 700px) {
+    .dual-track { grid-template-columns: 1fr; }
+  }
+
+  .track-card {
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 1.8rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .track-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .track-card.psy {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.06) 0%, rgba(20, 15, 30, 0.9) 100%);
+  }
+  .track-card.psy:hover { border-color: rgba(138, 43, 226, 0.3); }
+
+  .track-card.ai {
+    background: linear-gradient(135deg, rgba(0, 180, 255, 0.06) 0%, rgba(15, 20, 30, 0.9) 100%);
+  }
+  .track-card.ai:hover { border-color: rgba(0, 180, 255, 0.3); }
+
+  .track-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .track-card.psy .track-label { color: #c084fc; }
+  .track-card.ai .track-label { color: #67e8f9; }
+
+  .track-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 0.6rem;
+    color: #ddd;
+  }
+
+  .track-card .year-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: #777;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+    margin-bottom: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .track-card p {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #888;
+    font-weight: 300;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, #333, transparent);
+    margin: 0 auto 0;
+  }
+
+  /* ── CONVERGENCE SECTION ── */
+  .convergence {
+    text-align: center;
+    padding: 5rem 2rem;
+    position: relative;
+  }
+
+  .convergence::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 40% 50%, rgba(138, 43, 226, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 50%, rgba(0, 200, 255, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .convergence h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+  }
+
+  .convergence p {
+    max-width: 660px;
+    margin: 0 auto 1.5rem;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #999;
+    font-weight: 300;
+  }
+
+  /* ── MINI CHART ── */
+  .chart-wrapper {
+    max-width: 800px;
+    margin: 4rem auto 2rem;
+    padding: 2rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.015);
+  }
+
+  .chart-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  svg.timeline-chart {
+    width: 100%;
+    height: auto;
+  }
+
+  .footer-note {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #444;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1><span class="psy">Psychedelics</span> <span class="amp">&</span> <span class="ai">Artificial Intelligence</span></h1>
+  <p class="subtitle">Two technologies of mind. One that dissolves language, one that constructs it from math. Walking the same path through human history. The timing is the thing. It is almost impossible to ignore.</p>
+  <div class="scroll-hint">Scroll to begin ↓</div>
+</div>
+
+<!-- ═══════════ ERA 1: ANCIENT DREAMS ═══════════ -->
+<div class="timeline-container">
+
+<div class="era" data-era="1">
+  <div class="era-header">
+    <div class="era-date">Prehistory — 1900s</div>
+    <h2 class="era-title">The Ancient Dream</h2>
+    <p class="era-essay">Here's what's strange. Both ideas are ancient. Humans ate mushrooms in Mesoamerican temples and brewed ayahuasca in the Amazon, blending the border between the self and the world. Simultaneously, in myth, we imagined the reverse: building a self <em>from</em> the world. Talos. The Golem. Descartes' clockwork animals. Two fantasies, mirror-imaged, running for millennia before anyone had a word for either: <em>what if the mind could be experienced from outside of itself?</em> and <em>what if a mind could be animated from the inanimate?</em> And notice: both fantasies hinge on language. The mystical traditions shared their secrets through iterations of linguistic experiments because the experiences were poorly served by words alone. The dream of the thinking machine was always, at bottom, a dream of a machine that could <em>speak</em>. Leibniz's calculus of reason. Language is what makes us conscious, or so the story goes. The model here is necessarily incomplete. Stay with it.</p>
+  </div>
+  <div class="dual-track">
+    <div class="track-card psy">
+      <div class="track-label">Psychedelics</div>
+      <h3>Sacred Medicines</h3>
+      <span class="year-tag">~9000 BCE — 1900s</span>
+      <p>Psilocybin mushroom stone sculptures in Guatemala, 1000 BCE. The Rigveda hymns to Soma. The Eleusinian Mysteries, whose initiates were forbidden, on pain of death, from speaking about what they experienced. For millennia, plant medicines served as technologies of transcendence. And in every tradition, the same report: <em>ineffable, it cannot be put into words.</em> The experience preceded language. Or exceeded it. Not called drugs. They were the interface to something the Symbolic couldn't hold. The space between our brains before we spoke and the mechanisms of speaking.</p>
+    </div>
+    <div class="track-card ai">
+      <div class="track-label">Artificial Intelligence</div>
+      <h3>Mechanical Minds</h3>
+      <span class="year-tag">~800 BCE — 1900s</span>
+      <p>Homer describes Hephaestus forging golden handmaidens with minds. Leibniz dreams of a calculus of reason, language reduced to mathematics. Babbage builds his Analytical Engine. Ada Lovelace imagines a machine that composes music. The fantasy was always linguistic at its core: a machine that could enter the Symbolic order. Produce signifiers. Participate in the chain of meaning. The fantasy of constructed intelligence is exactly as old as consciousness reflecting on its own language. Which is the point.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ ERA 2: THE SPARK ═══════════ -->
+<div class="era" data-era="2">
+  <div class="era-header">
+    <div class="era-date">1938 — 1950</div>
+    <h2 class="era-title">The Spark</h2>
+    <p class="era-essay">Within a few years of each other, both fields leapt from fantasy to reality. A Swiss chemist accidentally touched his fingers to his lips, or maybe, meant to eat it. A British mathematician wrote a paper that reimagined computation itself. Neither knew the other existed. Neither knew they were lighting fuses that would burn in parallel for the next century, snuffed out at the same moment, relit at the same moment. Weird coincidence?</p>
+  </div>
+  <div class="dual-track">
+    <div class="track-card psy">
+      <div class="track-label">Psychedelics</div>
+      <h3>Hofmann's (Maybe) Accident</h3>
+      <span class="year-tag">1938 / 1943</span>
+      <p>Albert Hofmann synthesizes LSD-25 at Sandoz in Basel, 1938. Five years later he accidentally absorbs a small amount through his fingertips. Or perhaps on purpose. Regardless, on April 19, 1943, which came to be called Bicycle Day, he intentionally takes 250 micrograms. That's not very much of most drugs. It's quite a bit of LSD. He rides his bicycle home through a reality that had come unmoored. The subjective experience was, by his account, beyond language. The words that cannot be used. This will matter later.</p>
+    </div>
+    <div class="track-card ai">
+      <div class="track-label">Artificial Intelligence</div>
+      <h3>Turing's Vision</h3>
+      <span class="year-tag">1936 / 1950</span>
+      <p>Alan Turing publishes "On Computable Numbers" in 1936. He imagines a universal machine that can simulate any computation. In 1950, he asks the question that would define a field: Can machines think? The imitation game. A model that remains, like all models, necessarily incomplete, but potentially useful. The basic flaw in his philosophy was that he didn't live to see it.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ ERA 3: GOLDEN AGE ═══════════ -->
+<div class="era" data-era="3">
+  <div class="era-header">
+    <div class="era-date">1953 — 1966</div>
+    <h2 class="era-title">The Golden Age</h2>
+    <p class="era-essay">The 1950s and early 1960s were intoxicated with optimism. Researchers believed LSD could cure alcoholism, treat depression, unlock creativity. Computer scientists believed machines would match human intelligence within a generation. Federal money poured into both. The CIA dosed unwitting subjects under MKUltra, Artichoke, and Paper Clip. DARPA funded every ambitious AI proposal with little oversight. Both fields were drunk on possibility. And <em>the institutions funding them sometimes wanted weapons</em>. But here's the language thread again: LSD researchers kept reporting that their subjects' most profound experiences were <em>ineffable</em> — beyond the reach of the signifier. And AI researchers kept failing at natural language processing. Both fields were crashing against the same wall from opposite sides. The money was only sometimes clean. And language, the thing that constitutes consciousness, the thing Lacan said structures the unconscious itself, was the problem neither could solve.</p>
+  </div>
+  <div class="dual-track">
+    <div class="track-card psy">
+      <div class="track-label">Psychedelics</div>
+      <h3>A Thousand Studies</h3>
+      <span class="year-tag">1950 — 1965</span>
+      <p>Over a thousand clinical papers on LSD. Humphry Osmond coins "psychedelic"--literally, mind-manifesting--in 1957. Cary Grant undergoes LSD therapy. Bill Wilson advocates its use. Leary starts the Harvard Psilocybin Project. For a brief window, these are respectable medicines. But the measurement problem haunted every study: the most therapeutically significant experiences were the ones subjects couldn't describe. The Mystical Experience Questionnaire was an attempt to put language around something that, by definition, resisted it. The signifier couldn't catch the Real. The science was trying but dependent on the usual ways of measuring. Of asking. The words were failing.</p>
+    </div>
+    <div class="track-card ai">
+      <div class="track-label">Artificial Intelligence</div>
+      <h3>Summer of Intelligence</h3>
+      <span class="year-tag">1956 — 1965</span>
+      <p>The 1956 Dartmouth Conference coins "artificial intelligence." Rosenblatt builds the Perceptron in 1958. Herbert Simon predicts machines will be world chess champions within ten years. He was wrong about the timeline, right about almost everything else. But the real ambition was language. Machine translation. Natural language understanding. Machines that could enter the signifier chain. They couldn't. Not yet. DARPA funds the work lavishly. The optimism is limitless. The machines can calculate but they cannot speak. This will matter later, too.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ ERA 4: THE WINTER ═══════════ -->
+<div class="era" data-era="4">
+  <div class="era-header">
+    <div class="era-date">1970 — 1990</div>
+    <h2 class="era-title">The Long Winter</h2>
+    <p class="era-essay">Then the door slammed shut. On both. At the same time. This is the part where, if you're paying attention, it gets hard to call it coincidence. In 1970, Nixon signed the Controlled Substances Act. LSD, Schedule I. No accepted medical use. Clinical research: over. In the same period, 1969 to 1974, AI's promises collided with the Mansfield Amendment, the Lighthill Report, and reality. Funding cratered. For two decades, both fields became <em>unspeakable (see?) in polite scientific company</em>. Psychedelic researchers hid their data. AI researchers rebranded as "knowledge engineers." Both communities went underground. Psychedelic exceptionalism and AI exceptionalism, the belief that the rules don't apply here, that this is too important to regulate, had given the establishment its excuse in both cases. The culture, counter and hegemonic, killed one. Overpromising killed the other.</p>
+  </div>
+  <div class="dual-track">
+    <div class="track-card psy">
+      <div class="track-label">Psychedelics</div>
+      <h3>Schedule I</h3>
+      <span class="year-tag">1970</span>
+      <p>The Controlled Substances Act classifies LSD, psilocybin, and mescaline as Schedule I. No accepted medical use. High potential for abuse. A thousand clinical papers become inaccessible overnight. Scientists who continue are marginalized. It's absolutely insane, in retrospect. The counterculture's embrace gave the establishment its excuse. The substances become synonymous with danger. The data, actual, hard-earned though often ethically dubious, goes into drawers for fifty years.</p>
+    </div>
+    <div class="track-card ai">
+      <div class="track-label">Artificial Intelligence</div>
+      <h3>AI Winter</h3>
+      <span class="year-tag">1969 — 1974</span>
+      <p>Minsky and Papert's 1969 "Perceptrons" devastates neural network research. The Mansfield Amendment restricts military funding for basic science. The Lighthill Report of 1973 is scathing. DARPA cuts AI funding dramatically by 1974. Researchers scatter. The term "artificial intelligence" itself becomes embarrassing and something of a marker of naïve ambition. If you worked on neural networks, you didn't say so. You said you worked on "pattern recognition." The parallel to researchers who stopped saying "psychedelic" is remarkable.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ ERA 5: UNDERGROUND ═══════════ -->
+<div class="era" data-era="5">
+  <div class="era-header">
+    <div class="era-date">1986 — 2005</div>
+    <h2 class="era-title">Seeds Under Snow</h2>
+    <p class="era-essay">But neither idea died. You can't kill an idea whose time hasn't finished coming. In both cases, a handful of stubborn believers kept the work alive through institutional winter. They reframed their language. They found niches within acceptable science. They just kept doing the work. The people who did this: Shulgin synthesizing compounds in his backyard lab, Nichols building the funding infrastructure at Heffter, Hinton persisting with neural nets through years of rejection were not visionaries in any romantic sense. They were <em>patient</em>. They were willing to be embarrassed by their own field for decades. Je sais bien, mais quand même. I know very well it's out of fashion, but nevertheless.</p>
+  </div>
+  <div class="dual-track">
+    <div class="track-card psy">
+      <div class="track-label">Psychedelics</div>
+      <h3>The Backyard & The Institute</h3>
+      <span class="year-tag">1976 — 2006</span>
+      <p>Alexander Shulgin synthesizes and self-tests hundreds of psychedelic compounds in his home lab through the entire prohibition. He and his wife Ann publish PIHKAL and TIHKAL. This is systematic pharmacology disguised as memoir. Meanwhile, David Nichols, a Purdue pharmacologist, founds the Heffter Research Institute in 1993 to fund rigorous psychedelic science through institutional channels. Heffter funds Griffiths' landmark 2006 psilocybin study at Hopkins. Two strategies for surviving winter: one man in his backyard keeping the chemistry alive, another building the credibility infrastructure so the science could come back in from the cold. Both necessary.</p>
+    </div>
+    <div class="track-card ai">
+      <div class="track-label">Artificial Intelligence</div>
+      <h3>Neural Nets Survive</h3>
+      <span class="year-tag">1986 — 2006</span>
+      <p>Rumelhart, Hinton, and Williams publish the backpropagation paper in 1986. But progress is slow. Hardware can't keep up. Deep Blue beats Kasparov in 1997, but that's brute force, not intelligence. Hinton, LeCun, and Bengio persist through years of rejection. They call themselves "connectionists" to avoid the AI stigma, the same move Nichols made by calling it "pharmacology" instead of "psychedelic research." You rename the thing so the institutions will let you keep working on it. Shulgin didn't bother renaming anything. He just kept synthesizing. The AI equivalent might be the hobbyist neural net community that kept tinkering when no one was funding them. Complementary efforts.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ ERA 6: RENAISSANCE ═══════════ -->
+<div class="era" data-era="6">
+  <div class="era-header">
+    <div class="era-date">2012 — Present</div>
+    <h2 class="era-title">The Simultaneous Renaissance</h2>
+    <p class="era-essay">And then, in the 2010s, both came roaring back. Together. Again. And here is where the language thread becomes the whole story. The AI breakthrough was not vision, not robotics, not game-playing. It was <em>language</em>. Large language models. Generative pre-trained transformers. Machines that finally learned to simulate signifiers, to convincingly seem to enter the Symbolic order, to generate text that is indistinguishable from human speech, or at least close enough to be confusing. Language constructed from math. Meanwhile, the psychedelic renaissance arrived with the same old problem: the most therapeutically meaningful experiences are still the ones that resist linguistic description. The ineffable. The Real. One technology finally <em>cracked</em> language. The other still can't capture what it does in words but with a focus on clinical efficacy, capturing the experience itself is less important. If they work as drugs, it matters less how exactly they work as drugs. They arrived at the mainstream at the same time, from opposite sides of the same wall.</p>
+  </div>
+  <div class="dual-track">
+    <div class="track-card psy">
+      <div class="track-label">Psychedelics</div>
+      <h3>Breakthrough</h3>
+      <span class="year-tag">2018 — 2025</span>
+      <p>FDA grants breakthrough therapy designation to psilocybin for depression, 2018 and 2019. Oregon legalizes psilocybin therapy in 2020. Colorado follows. Australia approves psilocybin and MDMA for clinical use in 2023. The science is better this time. The methodology is better. The regulatory pathway is real. But the fundamental problem persists: the mechanism of therapeutic action appears to involve an experience that dissolves the subject's relationship to the Symbolic order and with it to their usually rigidly constructed self. The loss of the story we tell ourselves about ourselves. Ego dissolution. Loss of narrative self. The patient gets better, and when you ask them what happened, they still can't quite tell you. The signifier fails. That's the treatment.</p>
+    </div>
+    <div class="track-card ai">
+      <div class="track-label">Artificial Intelligence</div>
+      <h3>The Explosion</h3>
+      <span class="year-tag">2012 — 2025</span>
+      <p>AlexNet wins ImageNet in 2012. AlphaGo defeats Lee Sedol in 2016. Then GPT. The thing that finally broke through to massive general use and public attention. The thing that ended AI winter was language. Not chess. Not Go. Not image recognition. Language models. Signifiers generated from statistical patterns across billions of tokens. Language constructed from mathematics, without a subject behind it. No unconscious. No body. No Real. Just the Symbolic order, running on its own. ChatGPT launches in November 2022 and a hundred million people start talking to a machine that talks back. The question is no longer "can machines think?" The question is: <em>is this what language always was?</em></p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════ CHART ═══════════ -->
+<div class="chart-wrapper">
+  <div class="chart-title">Research Activity & Cultural Prominence — necessarily incomplete, often wrong, but potentially useful</div>
+  <svg class="timeline-chart" viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg">
+    <!-- Grid -->
+    <line x1="60" y1="30" x2="60" y2="230" stroke="#222" stroke-width="1"/>
+    <line x1="60" y1="230" x2="740" y2="230" stroke="#222" stroke-width="1"/>
+
+    <!-- Decade labels -->
+    <text x="60" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">1940</text>
+    <text x="140" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">1950</text>
+    <text x="220" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">1960</text>
+    <text x="300" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">1970</text>
+    <text x="380" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">1980</text>
+    <text x="460" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">1990</text>
+    <text x="540" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">2000</text>
+    <text x="620" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">2010</text>
+    <text x="700" y="252" fill="#555" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">2020</text>
+
+    <!-- Grid lines -->
+    <line x1="140" y1="30" x2="140" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="220" y1="30" x2="220" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="300" y1="30" x2="300" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="380" y1="30" x2="380" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="460" y1="30" x2="460" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="540" y1="30" x2="540" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="620" y1="30" x2="620" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+    <line x1="700" y1="30" x2="700" y2="230" stroke="#181818" stroke-width="1" stroke-dasharray="2,4"/>
+
+    <!-- "Prohibition / Winter" shaded region -->
+    <rect x="296" y="30" width="168" height="200" fill="rgba(255,255,255,0.02)" rx="4"/>
+    <text x="380" y="22" fill="#444" font-size="9" text-anchor="middle" font-family="Inter, sans-serif" font-style="italic">The Long Winter</text>
+
+    <!-- Psychedelics curve -->
+    <path d="M60,225 C80,225 100,220 120,210 C140,195 160,150 180,100 C200,70 220,55 240,58
+             C260,62 280,100 300,180 C320,215 340,222 380,224 C420,224 440,222 460,218
+             C480,214 500,210 520,204 C540,196 560,180 580,160 C600,130 640,80 680,50 C700,40 720,35 740,30"
+          fill="none" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- AI curve -->
+    <path d="M60,228 C80,228 100,228 120,226 C140,222 150,218 160,210 C180,190 200,150 220,120
+             C240,100 260,105 280,140 C300,180 320,210 340,220 C360,224 380,224 400,222
+             C420,218 440,210 460,198 C480,188 500,182 520,178 C540,172 560,160 580,140
+             C600,110 620,80 660,48 C680,36 700,30 740,22"
+          fill="none" stroke="#67e8f9" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Legend -->
+    <line x1="80" y1="270" x2="100" y2="270" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="108" y="274" fill="#888" font-size="10" font-family="Inter, sans-serif">Psychedelics</text>
+    <line x1="200" y1="270" x2="220" y2="270" stroke="#67e8f9" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="228" y="274" fill="#888" font-size="10" font-family="Inter, sans-serif">Artificial Intelligence</text>
+
+    <!-- Key event markers -->
+    <circle cx="84" cy="222" r="3" fill="#c084fc" opacity="0.9"/>
+    <text x="84" y="240" fill="#777" font-size="7" text-anchor="middle" font-family="Inter, sans-serif">LSD</text>
+
+    <circle cx="168" cy="190" r="3" fill="#67e8f9" opacity="0.9"/>
+    <text x="168" y="178" fill="#777" font-size="7" text-anchor="middle" font-family="Inter, sans-serif">Dartmouth</text>
+
+    <circle cx="300" cy="180" r="3" fill="#c084fc" opacity="0.9"/>
+    <text x="307" y="172" fill="#777" font-size="7" text-anchor="end" font-family="Inter, sans-serif">Sched. I</text>
+
+    <circle cx="310" cy="186" r="3" fill="#67e8f9" opacity="0.9"/>
+    <text x="325" y="198" fill="#777" font-size="7" text-anchor="start" font-family="Inter, sans-serif">Funding cuts</text>
+
+    <circle cx="700" cy="40" r="3" fill="#c084fc" opacity="0.9"/>
+    <circle cx="700" cy="28" r="3" fill="#67e8f9" opacity="0.9"/>
+  </svg>
+</div>
+
+<!-- ═══════════ CLOSING ═══════════ -->
+<div class="convergence">
+  <div class="era visible">
+    <h2>The Adjacent Question</h2>
+    <p>What makes this coincidence worth noticing isn't the timing alone. It's the deeper symmetry, and language is the key to it.</p>
+    <p>Lacan argued that the unconscious is structured like a language. That the subject, possessing consciousness itself, is an effect of the signifier. You don't have a self that then learns to speak. You enter the Symbolic order, and the self is what precipitates out. Language doesn't describe consciousness. <em>Language constitutes it.</em></p>
+    <p>If that's true, then these two technologies are doing something extraordinary from opposite directions. Psychedelics dissolve the subject's relationship to the Symbolic order. They take language away. Ego dissolution, oceanic boundlessness, the mystical experience. These are all descriptions of what happens when the signifier chain breaks down and the subject encounters the Real: that which resists symbolization absolutely. The treatment works, apparently, because something therapeutic happens in the space <em>where language fails</em>.</p>
+    <p>And generative AI? It produces signifiers without a subject. Language without an unconscious. The Symbolic order running autonomously with no body, no Real, no lack, no desire. Just the signifier chain, generating the next token from statistical patterns across the entire corpus of human language. Language constructed from mathematics. It turns out you can build something that speaks without anything behind the speech. Or at least something that passes for speech well enough that a hundred million people can't tell the difference enough to not use it.</p>
+    <p>Both arrived at the same moment. One dissolves the subject and leaves something beyond language. The other produces language and leaves out the subject entirely. Both force the same question, and it's not the one people usually ask. It's not "what is consciousness?" It's: <em>what is the relationship between language and consciousness, and what happens when you break it from both sides at once?</em></p>
+    <p>The institutions that controlled access to both, the FDA and DARPA, the DEA and the NSF decided at roughly the same historical moment that these were dangerous lines of inquiry, and then decided, again at roughly the same moment, that they weren't. The pattern says something about how societies manage transformative ideas about the mind: with cycles of enthusiasm, panic, prohibition, and rediscovery. The same cycle. The same timing.</p>
+    <p>And both fields, in their current renaissance, face the structural risk that stalled them last time. Psychedelic exceptionalism is back. AI exceptionalism is back. The overpromising. The institutional money that wants something specific in return. The culture that can't decide if it's terrified or ecstatic. We've seen this movie. We've seen it twice, running in parallel.</p>
+    <p style="color: #666; margin-top: 2rem; font-style: italic;">The model is necessarily incomplete. Often wrong. But potentially useful. One technology takes language away and something heals. The other constructs language from nothing and something thinks — or performs thinking well enough that the difference might not matter. The unconscious is structured like a language. The language model is structured like an unconscious. Same wall. Both sides. Same time. Off we go.</p>
+  </div>
+</div>
+
+<div class="footer-note">dan</div>
+
+<script>
+// Intersection observer for scroll-reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.era').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

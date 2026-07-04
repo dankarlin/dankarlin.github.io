@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cymbalta® Counter</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="description" content="A live counter tracking how long it has been since its manufacturer announced FDA approval of Cymbalta® for generalized anxiety disorder.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    color: #e0ddd5;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(10,10,15,0.95) 0%, transparent 100%);
+  }
+
+  .nav-home {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-home:hover { color: #aaa; }
+
+  .nav-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 7rem 2rem 5rem;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .main::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(180, 140, 60, 0.055) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* ── FRAMING TEXT ── */
+  .framing-above {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.7rem, 1.4vw, 0.82rem);
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 2.5rem;
+  }
+
+  .framing-below {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .framing-below .context {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 400;
+    line-height: 1.55;
+    color: #a09890;
+  }
+
+  .framing-below .drug-name {
+    color: #c8b97a;
+    font-style: normal;
+  }
+
+  .context-divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(200, 185, 122, 0.25) 20%, rgba(200, 185, 122, 0.25) 80%, transparent);
+    margin: 1.75rem auto;
+  }
+
+  .context-conclusion {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.82rem, 1.8vw, 1.05rem);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #c0c0d0;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .pr-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #444;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s;
+  }
+
+  .pr-link:hover {
+    text-decoration-color: #888;
+  }
+
+  /* ── COUNTER ── */
+  .counter-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+    width: 100%;
+    position: relative;
+  }
+
+  .counter-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    position: relative;
+    width: 100%;
+  }
+
+  .years-row {
+    margin-bottom: 0.75rem;
+  }
+
+  .details-row {
+    gap: clamp(0.8rem, 2.2vw, 1.8rem);
+  }
+
+  .counter-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .counter-unit:hover {
+    transform: translateY(-4px);
+  }
+
+  .counter-value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5.5vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: #e8e4dc;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    text-shadow: 0 0 25px rgba(232, 228, 220, 0.02);
+    display: inline-flex;
+    justify-content: center;
+    min-width: 2.2ch;
+  }
+
+  .counter-unit:hover .counter-value {
+    color: #ffffff;
+    text-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
+  }
+
+  .counter-unit.years .counter-value {
+    font-size: clamp(5rem, 13vw, 11rem);
+    color: #c8b97a;
+    text-shadow: 0 0 30px rgba(200, 185, 122, 0.15);
+    min-width: 2.2ch;
+  }
+
+  .counter-unit.years:hover .counter-value {
+    color: #ebdca2;
+    text-shadow: 0 0 40px rgba(235, 220, 162, 0.35);
+  }
+
+  .counter-unit.days .counter-value {
+    min-width: 2.2ch;
+  }
+
+  .counter-unit.seconds .counter-value {
+    color: #7a7a9a;
+  }
+
+  .counter-unit.seconds:hover .counter-value {
+    color: #a0a0ca;
+    text-shadow: 0 0 25px rgba(160, 160, 202, 0.2);
+  }
+
+  .counter-label {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #777;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .counter-unit:hover .counter-label {
+    color: #aaa;
+  }
+
+  .counter-unit.years .counter-label {
+    font-size: clamp(0.7rem, 1.4vw, 0.85rem);
+    color: #9a8a4a;
+    letter-spacing: 0.3em;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .counter-unit.years:hover .counter-label {
+    color: #c8b97a;
+  }
+
+  /* Separators between units */
+  .counter-sep {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: #333;
+    line-height: 1;
+    margin-bottom: 1.1rem;
+    user-select: none;
+  }
+
+  /* Pulse on tick */
+  @keyframes tickPulse {
+    0% { color: #6a6a82; }
+    100% { color: #4a4a5a; }
+  }
+
+  .tick-flash {
+    animation: tickPulse 0.4s ease-out forwards;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, #222, transparent);
+    margin: 0 auto 2.5rem;
+  }
+
+  /* ── SUBTEXT ── */
+  .subtext {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: #888;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    line-height: 1.7;
+    max-width: 560px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .counter-sep { display: none; }
+    .details-row { gap: 1rem; }
+    .framing-below { margin-top: 2rem; }
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    width: 100%;
+    padding: 4rem 2rem 5rem;
+    background: linear-gradient(to bottom, transparent, rgba(10, 10, 15, 0.5) 30%, rgba(10, 10, 15, 0.9) 100%);
+    border-top: 1px solid rgba(200, 185, 122, 0.05); /* very soft gold border */
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .footer-primary {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.8rem;
+  }
+
+  .footer-primary a {
+    color: #9a8a4a; /* Dimmed gold */
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(154, 138, 74, 0.4);
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-bottom-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .footer-primary a:hover {
+    color: #c8b97a; /* Main gold */
+    border-bottom-color: #c8b97a;
+  }
+
+  .footer-primary .sep {
+    color: #444;
+    user-select: none;
+  }
+
+  .footer-secondary {
+    font-size: 0.7rem;
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+    color: #555;
+    max-width: 600px;
+  }
+
+  .footer-secondary p {
+    margin-bottom: 0.25rem;
+  }
+
+  .footer-secondary p:last-child {
+    margin-bottom: 0;
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-home" href="/">dankarlin.com</a>
+  <span class="nav-tag">Since Feb 26, 2007</span>
+</nav>
+
+<main class="main">
+
+  <div class="framing-above">It has been</div>
+
+  <div class="counter-container">
+    <div class="counter-row years-row">
+      <div class="counter-unit years">
+        <div class="counter-value" id="years">—</div>
+        <div class="counter-label">Years</div>
+      </div>
+    </div>
+
+    <div class="counter-row details-row">
+      <div class="counter-unit days">
+        <div class="counter-value" id="days">—</div>
+        <div class="counter-label">Days</div>
+      </div>
+
+      <div class="counter-sep">·</div>
+
+      <div class="counter-unit hours">
+        <div class="counter-value" id="hours">—</div>
+        <div class="counter-label">Hours</div>
+      </div>
+
+      <div class="counter-sep">·</div>
+
+      <div class="counter-unit minutes">
+        <div class="counter-value" id="minutes">—</div>
+        <div class="counter-label">Minutes</div>
+      </div>
+
+      <div class="counter-sep">·</div>
+
+      <div class="counter-unit seconds">
+        <div class="counter-value" id="seconds">—</div>
+        <div class="counter-label">Seconds</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="framing-below">
+    <p class="context">since <a href="https://investor.lilly.com/news-releases/news-release-details/fda-approves-cymbaltar-treatment-generalized-anxiety-disorder" target="_blank" rel="noopener" class="pr-link">the FDA approval of</a> <span class="drug-name">Cymbalta®</span> for generalized anxiety disorder (GAD)</p>
+    <div class="context-divider"></div>
+    <p class="context-conclusion">No GAD drug has been approved since</p>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-primary">
+      <span>FDA approval announced February 26, 2007</span>
+      <span class="sep">·</span>
+      <a href="https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2007/021427s015ltr.pdf" target="_blank" rel="noopener">FDA Approval Letter</a>
+    </div>
+    <div class="footer-secondary">
+      <p>Cymbalta® is a registered trademark of Eli Lilly and Company.</p>
+      <p>This page is not affiliated with, sponsored by, or endorsed by Eli Lilly and Company or the FDA.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Start date: February 26, 2007 — FDA approval announced
+  const START = new Date('2007-02-26T00:00:00');
+
+  const el = {
+    years:   document.getElementById('years'),
+    days:    document.getElementById('days'),
+    hours:   document.getElementById('hours'),
+    minutes: document.getElementById('minutes'),
+    seconds: document.getElementById('seconds'),
+  };
+
+  let lastSeconds = -1;
+
+  function pad(n, width = 2) {
+    return String(n).padStart(width, '0');
+  }
+
+  function update() {
+    const now = new Date();
+    const totalMs = now - START;
+
+    // Total seconds elapsed
+    const totalSec = Math.floor(totalMs / 1000);
+
+    // Years: count actual calendar years
+    let years = now.getFullYear() - START.getFullYear();
+    const anniversaryThisYear = new Date(now.getFullYear(), START.getMonth(), START.getDate());
+    if (now < anniversaryThisYear) years--;
+
+    // Days since last anniversary
+    const lastAnniversary = new Date(START.getFullYear() + years, START.getMonth(), START.getDate());
+    const msSinceAnniversary = now - lastAnniversary;
+    const daysSinceAnniversary = Math.floor(msSinceAnniversary / (1000 * 60 * 60 * 24));
+
+    // Time components within current day
+    const remainder = msSinceAnniversary - daysSinceAnniversary * 86400000;
+    const hours   = Math.floor(remainder / 3600000);
+    const minutes = Math.floor((remainder % 3600000) / 60000);
+    const seconds = Math.floor((remainder % 60000) / 1000);
+
+    el.years.textContent   = years;
+    el.days.textContent    = daysSinceAnniversary;
+    el.hours.textContent   = pad(hours);
+    el.minutes.textContent = pad(minutes);
+
+    if (seconds !== lastSeconds) {
+      el.seconds.textContent = pad(seconds);
+      el.seconds.classList.remove('tick-flash');
+      // force reflow for animation restart
+      void el.seconds.offsetWidth;
+      el.seconds.classList.add('tick-flash');
+      lastSeconds = seconds;
+    }
+  }
+
+  update();
+  setInterval(update, 250);
+</script>
+
+</body>
+</html>

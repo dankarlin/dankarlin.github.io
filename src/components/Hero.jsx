@@ -12,10 +12,10 @@ function Hero() {
               <Col md={6} className="text-center text-md-start">
                 <div className="fade-in">
                   <h1 className="display-3 fw-bold mb-4">Dan Karlin</h1>
-                  <p className="h3 mb-4" role="heading" aria-level="2">Chief Medical Officer & Digital Medicine Innovator</p>
+                  <p className="h3 mb-4" role="heading" aria-level="2">Chief Medical Officer &<br />Digital Medicine Innovator</p>
                   <p className="lead mb-4">
-                    Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. 
-                    Leading the development of psychedelic medicines for brain health disorders at MindMed.
+                    Board-certified psychiatrist specializing in digital medicine, clinical informatics, and healthcare innovation. 
+                    Leading the development of psychedelic medicines for brain health disorders at Definium Therapeutics.
                   </p>
                   <div className="section-divider d-none d-md-block"></div>
                   <div className="d-flex gap-3 justify-content-center justify-content-md-start flex-wrap">
@@ -44,7 +44,7 @@ function Hero() {
                 <div className="fade-in">
                   {/* Professional Photo - Local Hosting */}
                   <ProfilePhoto 
-                    src="/dan-karlin-photo.jpg"
+                    src="/dan-karlin-photo.webp"
                     alt="Dr. Dan Karlin - Chief Medical Officer"
                     className="mb-4"
                   />
@@ -55,7 +55,7 @@ function Hero() {
                     </div>
                     <div className="text-center">
                       <div className="h4 mb-1">CMO</div>
-                      <small className="text-light opacity-75">at MindMed</small>
+                      <small className="text-light opacity-75">at Definium Therapeutics</small>
                     </div>
                     <div className="text-center">
                       <div className="h4 mb-1">NYC</div>

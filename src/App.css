@@ -183,3 +183,148 @@ section {
     height: 150px;
   }
 }
+
+/* Premium Footer Section Styles */
+.footer-section {
+  background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important; /* Deep dark slate gradient */
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  font-display: swap;
+}
+
+.footer-bio {
+  color: #94a3b8 !important; /* Muted slate */
+}
+
+/* Social icons with sleek circular borders */
+.social-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.social-icon-link:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: #ffffff !important;
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Navigation links under Footer */
+.footer-link {
+  color: #94a3b8 !important;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+  display: inline-block;
+}
+
+.footer-link:hover {
+  color: #ffffff !important;
+  transform: translateX(3px);
+}
+
+/* Digital Lab footer link cards */
+.footer-lab-link {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer-lab-link i {
+  font-size: 1.1rem;
+  color: #3b82f6;
+  transition: all 0.3s ease;
+}
+
+.footer-lab-title {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.footer-lab-tag {
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.footer-lab-link:hover {
+  transform: translateX(4px);
+}
+
+.footer-lab-link:hover i {
+  color: #60a5fa;
+  transform: scale(1.1);
+}
+
+.footer-lab-link:hover .footer-lab-title {
+  color: #ffffff;
+}
+
+.footer-lab-link:hover .footer-lab-tag {
+  color: #3b82f6;
+}
+
+/* Back to Top button transition */
+.back-to-top-link {
+  color: #64748b !important;
+  transition: all 0.25s ease;
+}
+
+.back-to-top-link:hover {
+  color: #ffffff !important;
+}
+
+.back-to-top-link i {
+  transition: transform 0.25s ease;
+}
+
+.back-to-top-link:hover i {
+  transform: translateY(-2px);
+}
+
+/* Header Navbar Dropdown adjustments */
+.custom-nav-dropdown .dropdown-menu {
+  background-color: #1e293b; /* Premium slate dark */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 8px 0;
+  margin-top: 8px;
+}
+
+.custom-nav-dropdown .dropdown-item {
+  color: #94a3b8 !important;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  transition: all 0.25s ease;
+}
+
+.custom-nav-dropdown .dropdown-item i {
+  transition: transform 0.25s ease;
+}
+
+.custom-nav-dropdown .dropdown-item:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #ffffff !important;
+}
+
+.custom-nav-dropdown .dropdown-item:hover i {
+  transform: scale(1.15);
+}
+
+/* Extra accessibility contrast styles */
+.text-secondary-light {
+  color: #cbd5e1 !important;
+  font-weight: 600;
+}

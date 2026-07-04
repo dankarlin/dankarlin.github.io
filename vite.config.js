@@ -5,4 +5,23 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          bootstrap: ['react-bootstrap']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+    minify: true
+  },
+  server: {
+    port: 3000
+  },
+  preview: {
+    port: 3000
+  }
 })

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Literature Clock — Typewriter</title>
+<meta name="description" content="A literary clock: time told through quotes from classic literature, displayed on a vintage typewriter.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #100c07;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 70% at 50% 65%, #241508 0%, #100c07 100%);
+  font-family: 'Special Elite', 'American Typewriter', 'Courier New', monospace;
+}
+
+/* ── Layout ── */
+
+.scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  gap: 0;
+}
+
+.typewriter-wrap {
+  position: relative;
+  width: min(900px, 96vw);
+  aspect-ratio: 900 / 760; /* explicit height so child % values resolve correctly */
+}
+
+.typewriter-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* SVG viewBox is 900 × 760 (y: -160 → 600) */
+}
+
+/* ── Paper overlay ──
+   SVG viewBox: 0 -160 900 760  (visible y range: -160 to 600)
+   Paper x=185 w=530; platen top arc y=220
+   Platen top relative to viewBox: (220 − (−160)) / 760 = 380/760 = 50%
+   So overlay runs from top:0 to bottom:50% (= exactly the platen line)
+*/
+.paper-overlay {
+  position: absolute;
+  left: 20.56%;
+  top: 0;
+  width: 58.89%;
+  bottom: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  font-size: clamp(10px, 1.35vw, 14px); /* em base for children and background-size */
+  /* subtle horizontal rules matching line height */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.6em - 1px),
+    rgba(160, 140, 110, 0.12) calc(1.6em - 1px),
+    rgba(160, 140, 110, 0.12) 1.6em
+  );
+  background-size: 100% 1.6em;
+  background-position: 0 0.1em;
+}
+
+/* Anchor to the bottom of the overlay so text grows upward as quotes accumulate.
+   bottom: 1.8em reserves one blank line above the platen so the last typed
+   line never runs into the ribbon/bail area. */
+.paper-lines-container {
+  position: absolute;
+  bottom: 1.8em;
+  left: 36px;
+  right: 36px;
+  /* paper-advance animation target */
+}
+
+.paper-lines-container.advancing {
+  animation: paperAdvance 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes paperAdvance {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-13px); }
+  65%  { transform: translateY(-13px); }
+  100% { transform: translateY(0); }
+}
+
+/* ── Paper lines ── */
+
+.paper-line {
+  font-family: 'Special Elite', 'American Typewriter', 'Courier New', monospace;
+  line-height: 1.6;
+  color: #1e1509;
+  word-break: break-word;
+  transition: opacity 0.4s ease;
+}
+
+.paper-line.old   { opacity: 0.38; }
+.paper-line.older { opacity: 0.18; }
+
+.paper-line em {
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(30, 21, 9, 0.55);
+}
+
+
+/* ── Cursor ── */
+.cursor {
+  display: inline;
+  animation: cursorBlink 0.75s step-end infinite;
+  opacity: 1;
+}
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Status bar ── */
+.status-bar {
+  margin-top: -2px;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: clamp(9px, 1vw, 11px);
+  color: rgba(210, 175, 115, 0.3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  height: 1.6em;
+  line-height: 1.6em;
+  pointer-events: none;
+}
+
+/* ── Loading dots ── */
+.loading-text { opacity: 0.5; font-style: italic; }
+
+/* ── Keyboard Interaction ── */
+.keycap {
+  transition: transform 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.keycap.active {
+  transform: translateY(4px);
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="typewriter-wrap">
+
+    <!-- ════════════════════════════════════════════════
+         SVG TYPEWRITER ILLUSTRATION
+         ViewBox: 900 × 700
+         ════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════════════
+         SVG TYPEWRITER ILLUSTRATION — photorealistic REMINGTON PORTABLE NO. 5
+         ViewBox: 900 × 760 (y: -160 → 600)
+         ════════════════════════════════════════════════ -->
+    <svg class="typewriter-svg" viewBox="0 -160 900 760"
+         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <!-- Body gradient: glossy black lacquer with volumetric reflection -->
+        <linearGradient id="gBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#3c3c41"/>
+          <stop offset="8%"   stop-color="#242429"/>
+          <stop offset="35%"  stop-color="#0f0f12"/>
+          <stop offset="75%"  stop-color="#060608"/>
+          <stop offset="90%"  stop-color="#18181c"/>
+          <stop offset="100%" stop-color="#020203"/>
+        </linearGradient>
+        
+        <!-- Horizontal body gradient for side panels and wrappers -->
+        <linearGradient id="gBodyH" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#060609"/>
+          <stop offset="15%"  stop-color="#222227"/>
+          <stop offset="35%"  stop-color="#3c3c43"/>
+          <stop offset="55%"  stop-color="#161619"/>
+          <stop offset="85%"  stop-color="#09090b"/>
+          <stop offset="100%" stop-color="#010102"/>
+        </linearGradient>
+        
+        <!-- Carriage gradient: high-density steel -->
+        <linearGradient id="gCarriage" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#4d4d54"/>
+          <stop offset="30%"  stop-color="#2d2d33"/>
+          <stop offset="70%"  stop-color="#18181c"/>
+          <stop offset="100%" stop-color="#0b0b0c"/>
+        </linearGradient>
+        
+        <!-- Platen: vulcanized black rubber cylinder -->
+        <linearGradient id="gPlaten" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#4c4c54"/>
+          <stop offset="20%"  stop-color="#27272b"/>
+          <stop offset="75%"  stop-color="#131316"/>
+          <stop offset="100%" stop-color="#0a0a0c"/>
+        </linearGradient>
+        
+        <!-- Chrome hardware: highly reflective sky/ground metallic gradients -->
+        <linearGradient id="gChrome" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#ffffff"/>
+          <stop offset="18%"  stop-color="#dedede"/>
+          <stop offset="38%"  stop-color="#a3a3a8"/>
+          <stop offset="47%"  stop-color="#48484a"/>
+          <stop offset="50%"  stop-color="#121214"/>
+          <stop offset="53%"  stop-color="#808084"/>
+          <stop offset="82%"  stop-color="#f2f2f5"/>
+          <stop offset="100%" stop-color="#939399"/>
+        </linearGradient>
+        
+        <!-- Chrome horizontal reflection -->
+        <linearGradient id="gChromeH" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#808084"/>
+          <stop offset="20%"  stop-color="#f2f2f5"/>
+          <stop offset="45%"  stop-color="#ffffff"/>
+          <stop offset="50%"  stop-color="#121214"/>
+          <stop offset="55%"  stop-color="#939399"/>
+          <stop offset="80%"  stop-color="#dedede"/>
+          <stop offset="100%" stop-color="#48484a"/>
+        </linearGradient>
+        
+        <!-- Gold foil decal gradient for Remington branding -->
+        <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#ffe9a6"/>
+          <stop offset="30%"  stop-color="#e3be47"/>
+          <stop offset="65%"  stop-color="#b88f1d"/>
+          <stop offset="90%"  stop-color="#85610b"/>
+          <stop offset="100%" stop-color="#543a03"/>
+        </linearGradient>
+        
+        <!-- Platen knob metal gradient -->
+        <radialGradient id="gKnob" cx="35%" cy="30%" r="65%">
+          <stop offset="0%"   stop-color="#ffffff"/>
+          <stop offset="30%"  stop-color="#dcdcdf"/>
+          <stop offset="70%"  stop-color="#55555c"/>
+          <stop offset="95%"  stop-color="#242429"/>
+          <stop offset="100%" stop-color="#111113"/>
+        </radialGradient>
+        
+        <!-- spherical keycaps -->
+        <radialGradient id="gBlackKey" cx="35%" cy="30%" r="65%">
+          <stop offset="0%"   stop-color="#606670"/>
+          <stop offset="28%"  stop-color="#2f3542"/>
+          <stop offset="68%"  stop-color="#141822"/>
+          <stop offset="92%"  stop-color="#050810"/>
+          <stop offset="100%" stop-color="#000000"/>
+        </radialGradient>
+        
+        <radialGradient id="gRedKey" cx="35%" cy="30%" r="65%">
+          <stop offset="0%"   stop-color="#ff9b9b"/>
+          <stop offset="25%"  stop-color="#ef4444"/>
+          <stop offset="65%"  stop-color="#991b1b"/>
+          <stop offset="92%"  stop-color="#570c0c"/>
+          <stop offset="100%" stop-color="#2d0505"/>
+        </radialGradient>
+        
+        <radialGradient id="gGrayKey" cx="35%" cy="30%" r="65%">
+          <stop offset="0%"   stop-color="#b1b5c0"/>
+          <stop offset="35%"  stop-color="#5d6270"/>
+          <stop offset="78%"  stop-color="#2c303b"/>
+          <stop offset="100%" stop-color="#16181f"/>
+        </radialGradient>
+ 
+        <!-- Key well depth shading -->
+        <linearGradient id="gKeyWell" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#020408"/>
+          <stop offset="12%"  stop-color="#0c101a"/>
+          <stop offset="85%"  stop-color="#1b202e"/>
+          <stop offset="100%" stop-color="#020408"/>
+        </linearGradient>
+ 
+        <!-- Paper: warm deckled cream -->
+        <linearGradient id="gPaper" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#d4c9b3"/>
+          <stop offset="4%"   stop-color="#fefcf8"/>
+          <stop offset="96%"  stop-color="#fefcf8"/>
+          <stop offset="100%" stop-color="#d4c9b3"/>
+        </linearGradient>
+        
+        <!-- Typewriter drop shadow -->
+        <filter id="fShadow" x="-12%" y="-8%" width="124%" height="128%">
+          <feDropShadow dx="0" dy="18" stdDeviation="22"
+                        flood-color="#000" flood-opacity="0.88"/>
+        </filter>
+        
+        <!-- Key well / recess shadow -->
+        <filter id="fKeyInner" x="-15%" y="-15%" width="130%" height="130%">
+          <feDropShadow dx="0" dy="5" stdDeviation="7"
+                        flood-color="#000" flood-opacity="0.85"/>
+        </filter>
+        
+        <!-- Subtle embossed decal look -->
+        <filter id="fDecal" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0.5" dy="1" stdDeviation="0.8" flood-color="#000" flood-opacity="0.75"/>
+        </filter>
+      </defs>
+
+      <!-- ── Whole machine with drop shadow ── -->
+      <g filter="url(#fShadow)">
+
+        <!-- ═══════════════════════════════════
+             PAPER TABLE (Glossy black support shelf behind the paper)
+             ═══════════════════════════════════ -->
+        <!-- Folding Chrome Paper Support Wings (extend above the table) -->
+        <!-- Left Wing -->
+        <path d="M 215,-380 L 195,-510 C 193,-520, 205,-525, 210,-518 L 235,-380 Z" fill="url(#gChrome)" filter="url(#fDecal)" opacity="0.95"/>
+        <circle cx="225" cy="-380" r="4" fill="#111"/>
+        <!-- Right Wing -->
+        <path d="M 685,-380 L 705,-510 C 707,-520, 695,-525, 690,-518 L 665,-380 Z" fill="url(#gChrome)" filter="url(#fDecal)" opacity="0.95"/>
+        <circle cx="675" cy="-380" r="4" fill="#111"/>
+
+        <!-- Glossy Black Paper Shelf -->
+        <rect x="150" y="-410" width="600" height="630" rx="12" fill="url(#gBody)" stroke="#000002" stroke-width="2.5" filter="url(#fShadow)"/>
+        <!-- Paper table inner trim / panel lines -->
+        <rect x="158" y="-402" width="584" height="614" rx="8" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1.5"/>
+        <!-- Top chrome rim on paper shelf -->
+        <path d="M 150,-410 Q 450,-406 750,-410" fill="none" stroke="url(#gChrome)" stroke-width="4.5" stroke-linecap="round"/>
+        <!-- Elegant gold branding decal on left and right ears of the shelf (always visible beyond paper width) -->
+        <g filter="url(#fDecal)" fill="url(#gGold)" font-family="'Playfair Display', Georgia, serif" font-weight="bold" font-size="10" letter-spacing="2">
+          <!-- Left ear decoration -->
+          <text x="165" y="-350" transform="rotate(-90, 165, -350)" text-anchor="middle" font-size="7">REMINGTON</text>
+          <!-- Right ear decoration -->
+          <text x="735" y="-350" transform="rotate(90, 735, -350)" text-anchor="middle" font-size="7">PORTABLE</text>
+        </g>
+
+        <!-- ═══════════════════════════════════
+             PAPER (drawn first so platen covers it)
+             ═══════════════════════════════════ -->
+        <rect x="185" y="-400" width="530" height="686" fill="url(#gPaper)"/>
+        <rect x="185" y="-400" width="4"   height="686" fill="#c3baa6" opacity="0.8"/>
+        <rect x="711" y="-400" width="4"   height="686" fill="#c3baa6" opacity="0.8"/>
+
+        <!-- ── Paper guide fingers (chrome clips) ── -->
+        <g filter="url(#fShadow)">
+          <rect x="200" y="35" width="14" height="190" rx="7" fill="url(#gChrome)" stroke="#111827" stroke-width="0.8"/>
+          <rect x="196" y="29" width="22" height="20"  rx="5" fill="url(#gChrome)" stroke="#111827" stroke-width="0.8"/>
+          <circle cx="207" cy="39" r="4" fill="#111827"/>
+        </g>
+        <g filter="url(#fShadow)">
+          <rect x="686" y="35" width="14" height="190" rx="7" fill="url(#gChrome)" stroke="#111827" stroke-width="0.8"/>
+          <rect x="682" y="29" width="22" height="20"  rx="5" fill="url(#gChrome)" stroke="#111827" stroke-width="0.8"/>
+          <circle cx="693" cy="39" r="4" fill="#111827"/>
+        </g>
+
+        <!-- ═══════════════════════════════════
+             CARRIAGE ASSEMBLY
+             ═══════════════════════════════════ -->
+        <!-- Carriage main bar (horizontal rail) -->
+        <rect x="100"  y="210" width="700" height="92" rx="9" fill="url(#gCarriage)" stroke="#09090b" stroke-width="1.5"/>
+        <rect x="100"  y="210" width="700" height="8"  rx="4" fill="rgba(255, 255, 255, 0.15)"/>
+
+        <!-- ═══════════════════════════════════
+             PLATEN CYLINDER
+             ═══════════════════════════════════ -->
+        <rect x="130" y="220" width="640" height="66" fill="url(#gPlaten)"/>
+        <!-- Platen top arc curve -->
+        <ellipse cx="450" cy="220" rx="320" ry="22" fill="#3b3b40"/>
+        <!-- Platen reflection sheet -->
+        <ellipse cx="450" cy="216" rx="280" ry="12" fill="#ffffff" opacity="0.08"/>
+        <!-- Platen bottom arc curve -->
+        <ellipse cx="450" cy="286" rx="320" ry="22" fill="#121214"/>
+
+        <!-- ── Detailed Red & Silver Paper Scale ── -->
+        <rect x="170" y="278" width="560" height="11" rx="2" fill="url(#gChrome)" stroke="#444" stroke-width="0.5"/>
+        <!-- Ruler marks (red ticks) -->
+        <path d="M 180,278 L 180,289 M 190,278 L 190,283 M 200,278 L 200,286 M 210,278 L 210,283 M 220,278 L 220,289 M 230,278 L 230,283 M 240,278 L 240,286 M 250,278 L 250,283 M 260,278 L 260,289 M 270,278 L 270,283 M 280,278 L 280,286 M 290,278 L 290,283 M 300,278 L 300,289 M 310,278 L 310,283 M 320,278 L 320,286 M 330,278 L 330,283 M 340,278 L 340,289 M 350,278 L 350,283 M 360,278 L 360,286 M 370,278 L 370,283 M 380,278 L 380,289 M 390,278 L 390,283 M 400,278 L 400,286 M 410,278 L 410,283 M 420,278 L 420,289 M 430,278 L 430,283 M 440,278 L 440,286 M 450,278 L 450,283 M 460,278 L 460,289 M 470,278 L 470,283 M 480,278 L 480,286 M 490,278 L 490,283 M 500,278 L 500,289 M 510,278 L 510,283 M 520,278 L 520,286 M 530,278 L 530,283 M 540,278 L 540,289 M 550,278 L 550,283 M 560,278 L 560,286 M 570,278 L 570,283 M 580,278 L 580,289 M 590,278 L 590,283 M 600,278 L 600,286 M 610,278 L 610,283 M 620,278 L 620,289 M 630,278 L 630,283 M 640,278 L 640,286 M 650,278 L 650,283 M 660,278 L 660,289 M 670,278 L 670,283 M 680,278 L 680,286 M 690,278 L 690,283 M 700,278 L 700,289 M 710,278 L 710,283 M 720,278 L 720,286" 
+              stroke="#b91c1c" stroke-width="0.8" opacity="0.8"/>
+        <!-- center marker -->
+        <polygon points="450,275 446,271 454,271" fill="#b91c1c"/>
+
+        <!-- ── Carriage chrome trim rail ── -->
+        <rect x="100" y="294" width="700" height="9" rx="4.5" fill="url(#gChrome)" stroke="#666" stroke-width="0.5"/>
+
+        <!-- ── Left Platen Knob (Rubber knurled rim, metal face) ── -->
+        <circle cx="115"  cy="253" r="26" fill="#09090b" filter="url(#fKeyInner)"/>
+        <!-- The knurled teeth rubber outer layer -->
+        <circle cx="115"  cy="253" r="23" fill="none" stroke="#161619" stroke-width="5"/>
+        <circle cx="115"  cy="253" r="23" fill="none" stroke="#374151" stroke-width="5" stroke-dasharray="3 3"/>
+        <circle cx="115"  cy="253" r="21" fill="url(#gChrome)" stroke="#1c1c1f" stroke-width="1"/>
+        <circle cx="115"  cy="253" r="18" fill="#18181b"/>
+        <!-- Machined inner chrome cap -->
+        <circle cx="115"  cy="253" r="11" fill="url(#gKnob)" stroke="#374151" stroke-width="0.75"/>
+        <circle cx="115"  cy="253" r="4"  fill="#09090b"/>
+
+        <!-- ── Right Platen Knob (Rubber knurled rim, metal face) ── -->
+        <circle cx="785" cy="253" r="26" fill="#09090b" filter="url(#fKeyInner)"/>
+        <!-- The knurled teeth rubber outer layer -->
+        <circle cx="785" cy="253" r="23" fill="none" stroke="#161619" stroke-width="5"/>
+        <circle cx="785" cy="253" r="23" fill="none" stroke="#374151" stroke-width="5" stroke-dasharray="3 3"/>
+        <circle cx="785" cy="253" r="21" fill="url(#gChrome)" stroke="#1c1c1f" stroke-width="1"/>
+        <circle cx="785" cy="253" r="18" fill="#18181b"/>
+        <!-- Machined inner chrome cap -->
+        <circle cx="785" cy="253" r="11" fill="url(#gKnob)" stroke="#374151" stroke-width="0.75"/>
+        <circle cx="785" cy="253" r="4"  fill="#09090b"/>
+
+        <!-- ── Beautiful sweeping carriage return lever (Left Side) ── -->
+        <g>
+          <!-- Base pivot bracket -->
+          <rect x="137" y="222" width="16" height="24" rx="4" fill="url(#gChrome)" stroke="#444" stroke-width="0.5"/>
+          <circle cx="145" cy="234" r="5" fill="#222"/>
+          <!-- Curved chrome return handle with reflective sky/ground gradients and micro-bevel highlight -->
+          <path d="M 145,234 C 145,190, 121,142, 113,115 C 107,98, 91,82, 103,70 C 111,62, 129,78, 133,92 C 141,118, 161,168, 161,234 Z" 
+                fill="url(#gChrome)" filter="url(#fShadow)" stroke="#444" stroke-width="0.5"/>
+          <!-- Specular highlight line along the inner ridge of the lever -->
+          <path d="M 100,230 C 100,192, 77,146, 69,120 C 65,105, 53,92, 61,80" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.4"/>
+          <!-- Black grip insert -->
+          <path d="M 61,70 C 59,66, 55,66, 53,70 C 49,76, 53,84, 61,80 Z" fill="#111"/>
+        </g>
+ 
+        <!-- ── Margin release lever tab (Left) ── -->
+        <rect x="82" y="215" width="7" height="28" rx="3.5" fill="url(#gChrome)" stroke="#555" stroke-width="0.5"/>
+ 
+        <!-- ═══════════════════════════════════
+             MAIN HOUSING (Glossy Remington Art Deco Enamel Casing)
+             ═══════════════════════════════════ -->
+        <!-- Curved black glossy outer shell -->
+        <rect x="88"  y="286" width="724" height="384" rx="24" fill="url(#gBody)" stroke="#09090b" stroke-width="2.5"/>
+        
+        <!-- Deep 3D recess border highlight -->
+        <rect x="90"  y="288" width="720" height="380" rx="22" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5"/>
+        
+        <!-- Gloss highlight reflection paths on body shoulders -->
+        <path d="M 112,289 Q 450,296 788,289 Q 794,295 798,310 Q 450,305 102,310 Q 106,295 112,289 Z" 
+              fill="rgba(255, 255, 255, 0.08)" />
+        <path d="M 94,310 Q 98,480 114,640 Q 102,642 96,620 Q 89,450 94,310 Z" 
+              fill="rgba(255, 255, 255, 0.04)" />
+        <path d="M 806,310 Q 802,480 786,640 Q 798,642 804,620 Q 811,450 806,310 Z" 
+              fill="rgba(255, 255, 255, 0.04)" />
+ 
+        <!-- Front name-plate panel with gorgeous Gold Foil "REMINGTON" branding & micro-screws -->
+        <rect x="108" y="291" width="684" height="26" rx="4" fill="#0c0c0e" stroke="#222226" stroke-width="0.75" filter="url(#fShadow)"/>
+        <!-- Inner bezel for front panel -->
+        <rect x="110" y="293" width="680" height="22" rx="3" fill="none" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1"/>
+        <text x="450" y="309" text-anchor="middle"
+              font-family="'Playfair Display', Georgia, serif"
+              font-size="14" font-weight="bold"
+              letter-spacing="8" fill="url(#gGold)" filter="url(#fDecal)">REMINGTON</text>
+        <!-- Chrome slot screws on front name-plate -->
+        <circle cx="122" cy="304" r="3" fill="url(#gChrome)" stroke="#09090c" stroke-width="0.5"/>
+        <line x1="119.5" y1="304" x2="124.5" y2="304" stroke="#111" stroke-width="0.8"/>
+        <circle cx="778" cy="304" r="3" fill="url(#gChrome)" stroke="#09090c" stroke-width="0.5"/>
+        <line x1="775.5" y1="303.5" x2="780.5" y2="304.5" stroke="#111" stroke-width="0.8"/>
+ 
+        <!-- ── Highly detailed metal typebar recess comb & spokes ── -->
+        <g id="typeBasket" transform="translate(0, 0)">
+          <!-- Deep segment shadow backing -->
+          <path d="M 320,317 C 320,265, 580,265, 580,317 Z" fill="#030305" filter="url(#fKeyInner)"/>
+          
+          <!-- Crimson felt resting cushion under hammer heads -->
+          <path d="M 326,316 C 326,270, 574,270, 574,316" fill="none" stroke="#6b1212" stroke-width="18" stroke-linecap="round" opacity="0.95"/>
+          <path d="M 326,316 C 326,270, 574,270, 574,316" fill="none" stroke="#991b1b" stroke-width="14" stroke-linecap="round" opacity="0.9"/>
+          <path d="M 326,316 C 326,270, 574,270, 574,316" fill="none" stroke="#fca5a5" stroke-width="1" stroke-linecap="round" opacity="0.25" stroke-dasharray="1 2"/>
+          
+          <!-- Radial Chrome Typebars resting in the comb -->
+          <g stroke="url(#gChrome)" stroke-width="1.8" opacity="0.9">
+            <line x1="450" y1="244" x2="338" y2="310"/>
+            <line x1="450" y1="244" x2="352" y2="305"/>
+            <line x1="450" y1="244" x2="368" y2="300"/>
+            <line x1="450" y1="244" x2="384" y2="295"/>
+            <line x1="450" y1="244" x2="400" y2="291"/>
+            <line x1="450" y1="244" x2="418" y2="288"/>
+            <line x1="450" y1="244" x2="436" y2="286"/>
+            <line x1="450" y1="244" x2="450" y2="285"/>
+            <line x1="450" y1="244" x2="464" y2="286"/>
+            <line x1="450" y1="244" x2="482" y2="288"/>
+            <line x1="450" y1="244" x2="500" y2="291"/>
+            <line x1="450" y1="244" x2="516" y2="295"/>
+            <line x1="450" y1="244" x2="532" y2="300"/>
+            <line x1="450" y1="244" x2="548" y2="305"/>
+            <line x1="450" y1="244" x2="562" y2="310"/>
+          </g>
+          
+          <!-- Curved chrome typebar comb segment shield -->
+          <path d="M 326,317 C 326,273, 574,273, 574,317" fill="none" stroke="url(#gChrome)" stroke-width="12" stroke-linecap="round"/>
+          <path d="M 326,317 C 326,273, 574,273, 574,317" fill="none" stroke="#000" stroke-width="14" stroke-linecap="round" opacity="0.3" filter="url(#fShadow)"/>
+          
+          <!-- Curved chrome typebar hammer heads (resting in individual comb slots) -->
+          <g fill="url(#gChrome)" stroke="#444" stroke-width="0.5">
+            <rect x="332" y="301" width="6" height="12" rx="1" transform="rotate(-40, 335, 307)"/>
+            <rect x="346" y="295" width="6" height="12" rx="1" transform="rotate(-34, 349, 301)"/>
+            <rect x="362" y="290" width="6" height="12" rx="1" transform="rotate(-28, 365, 296)"/>
+            <rect x="378" y="286" width="6" height="12" rx="1" transform="rotate(-22, 381, 292)"/>
+            <rect x="394" y="283" width="6" height="12" rx="1" transform="rotate(-16, 397, 289)"/>
+            <rect x="410" y="281" width="6" height="12" rx="1" transform="rotate(-10, 413, 287)"/>
+            <rect x="427" y="280" width="6" height="12" rx="1" transform="rotate(-4, 430, 286)"/>
+            <rect x="467" y="280" width="6" height="12" rx="1" transform="rotate(4, 470, 286)"/>
+            <rect x="484" y="281" width="6" height="12" rx="1" transform="rotate(10, 487, 287)"/>
+            <rect x="500" y="283" width="6" height="12" rx="1" transform="rotate(16, 503, 289)"/>
+            <rect x="516" y="286" width="6" height="12" rx="1" transform="rotate(22, 519, 292)"/>
+            <rect x="532" y="290" width="6" height="12" rx="1" transform="rotate(28, 535, 296)"/>
+            <rect x="548" y="295" width="6" height="12" rx="1" transform="rotate(34, 551, 301)"/>
+            <rect x="562" y="301" width="6" height="12" rx="1" transform="rotate(40, 565, 307)"/>
+          </g>
+          <!-- Highly detailed Chrome Ribbon Vibrator (Center Guide) -->
+          <g filter="url(#fShadow)">
+            <!-- Left and right support wings -->
+            <path d="M 436,252 L 441,222 L 447,224 L 443,252 Z M 464,252 L 459,222 L 453,224 L 457,252 Z" fill="url(#gChrome)" stroke="#111" stroke-width="0.5"/>
+            <!-- Center fork guides for alignment -->
+            <path d="M 444,216 L 444,252 M 456,216 L 456,252 M 438,247 L 462,247" stroke="url(#gChrome)" stroke-width="1.5"/>
+            <!-- Center pointer plate -->
+            <path d="M 442,236 L 442,252 L 458,252 L 458,236 L 450,224 Z" fill="url(#gChrome)" stroke="#222" stroke-width="0.5"/>
+            <!-- Triangle indicator pointer -->
+            <polygon points="450,226 447,232 453,232" fill="#be123c"/>
+            <!-- Tiny chrome slot rivet in the guide -->
+            <circle cx="450" cy="245" r="1.8" fill="url(#gChrome)" stroke="#111" stroke-width="0.5"/>
+            <line x1="449" y1="245" x2="451" y2="245" stroke="#111" stroke-width="0.5"/>
+          </g>
+
+          <!-- ── Spool lids on the shoulders ── -->
+          <!-- Left spool cover -->
+          <g filter="url(#fShadow)">
+            <circle cx="170" cy="316" r="38" fill="url(#gBody)" stroke="#09090b" stroke-width="2"/>
+            <!-- Ambient highlight edge ring -->
+            <circle cx="170" cy="316" r="36.5" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+            <!-- Circular brushed metal reflection sheets -->
+            <path d="M 134,316 A 36 36 0 0 1 206,316" fill="none" stroke="rgba(255, 255, 255, 0.04)" stroke-width="2"/>
+            <path d="M 170,280 A 36 36 0 0 1 170,352" fill="none" stroke="rgba(255, 255, 255, 0.04)" stroke-width="2"/>
+            <!-- Chrome center knob -->
+            <circle cx="170" cy="316" r="11" fill="url(#gChrome)" stroke="#222" stroke-width="0.5"/>
+            <circle cx="170" cy="316" r="8" fill="url(#gKnob)" stroke="#444" stroke-width="0.5"/>
+            <circle cx="170" cy="316" r="3"  fill="#09090b"/>
+          </g>
+          
+          <!-- Right spool cover -->
+          <g filter="url(#fShadow)">
+            <circle cx="730" cy="316" r="38" fill="url(#gBody)" stroke="#09090b" stroke-width="2"/>
+            <!-- Ambient highlight edge ring -->
+            <circle cx="730" cy="316" r="36.5" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+            <!-- Circular brushed metal reflection sheets -->
+            <path d="M 694,316 A 36 36 0 0 1 766,316" fill="none" stroke="rgba(255, 255, 255, 0.04)" stroke-width="2"/>
+            <path d="M 730,280 A 36 36 0 0 1 730,352" fill="none" stroke="rgba(255, 255, 255, 0.04)" stroke-width="2"/>
+            <!-- Chrome center knob -->
+            <circle cx="730" cy="316" r="11" fill="url(#gChrome)" stroke="#222" stroke-width="0.5"/>
+            <circle cx="730" cy="316" r="8" fill="url(#gKnob)" stroke="#444" stroke-width="0.5"/>
+            <circle cx="730" cy="316" r="3"  fill="#09090b"/>
+          </g>
+
+          <!-- ── Two-tone fabric typewriter ribbon ── -->
+          <!-- Left ribbon strip -->
+          <path d="M 185,324 L 436,244" stroke="#161619" stroke-width="5.5" stroke-linecap="round" opacity="0.95"/>
+          <path d="M 185,326.5 L 436,246.5" stroke="#b91c1c" stroke-width="2.6" stroke-linecap="round" opacity="0.95"/>
+          <!-- Fine weave specular highlights -->
+          <path d="M 185,324 L 436,244" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="1 1.5" opacity="0.08"/>
+          
+          <!-- Right ribbon strip -->
+          <path d="M 715,324 L 464,244" stroke="#161619" stroke-width="5.5" stroke-linecap="round" opacity="0.95"/>
+          <path d="M 715,326.5 L 464,246.5" stroke="#b91c1c" stroke-width="2.6" stroke-linecap="round" opacity="0.95"/>
+          <!-- Fine weave specular highlights -->
+          <path d="M 715,324 L 464,244" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="1 1.5" opacity="0.08"/>
+        </g>
+
+        <!-- Key well (the deep recessed area housing the QWERTY keyboard) -->
+        <rect x="103" y="316" width="694" height="352" rx="18" fill="url(#gKeyWell)" stroke="#111" stroke-width="1" filter="url(#fKeyInner)"/>
+        
+        <!-- Underlying steel mechanical key lever bars -->
+        <path d="M 120,320 L 120,560 M 145,320 L 145,560 M 170,320 L 170,560 M 195,320 L 195,560 M 220,320 L 220,560 M 245,320 L 245,560 M 270,320 L 270,560 M 295,320 L 295,560 M 320,320 L 320,560 M 345,320 L 345,560 M 370,320 L 370,560 M 395,320 L 395,560 M 420,320 L 420,560 M 445,320 L 445,560 M 470,320 L 470,560 M 495,320 L 495,560 M 520,320 L 520,560 M 545,320 L 545,560 M 570,320 L 570,560 M 595,320 L 595,560 M 620,320 L 620,560 M 645,320 L 645,560 M 670,320 L 670,560 M 695,320 L 695,560 M 720,320 L 720,560 M 745,320 L 745,560 M 770,320 L 770,560" 
+              stroke="#0f0f13" stroke-width="2.2" opacity="0.85"/>
+        <path d="M 121,320 L 121,560 M 146,320 L 146,560 M 171,320 L 171,560 M 196,320 L 196,560 M 221,320 L 221,560 M 246,320 L 246,560 M 271,320 L 271,560 M 296,320 L 296,560 M 321,320 L 321,560 M 346,320 L 346,560 M 371,320 L 371,560 M 396,320 L 396,560 M 421,320 L 421,560 M 446,320 L 446,560 M 471,320 L 471,560 M 496,320 L 496,560 M 521,320 L 521,560 M 546,320 L 546,560 M 571,320 L 571,560 M 596,320 L 596,560 M 621,320 L 621,560 M 646,320 L 646,560 M 671,320 L 671,560 M 696,320 L 696,560 M 721,320 L 721,560 M 746,320 L 746,560 M 771,320 L 771,560" 
+              stroke="#4b5563" stroke-width="0.8" opacity="0.4"/>
+        
+        <!-- Key well inner border highlight -->
+        <rect x="103" y="316" width="694" height="6" rx="3" fill="rgba(255, 255, 255, 0.08)"/>
+
+        <!-- Key rows injected via javascript inside this container -->
+        <g id="keyGroup"></g>
+
+        <!-- ── Polished black spacebar with chrome support arms ── -->
+        <!-- Left chrome support pillar -->
+        <rect x="280" y="580" width="14" height="25" fill="url(#gChrome)" stroke="#555" stroke-width="0.5"/>
+        <circle cx="287" cy="598" r="3" fill="#222"/>
+        <!-- Right chrome support pillar -->
+        <rect x="606" y="580" width="14" height="25" fill="url(#gChrome)" stroke="#555" stroke-width="0.5"/>
+        <circle cx="613" cy="598" r="3" fill="#222"/>
+        
+        <!-- Spacebar itself -->
+        <g class="keycap" id="key-SPACE" data-key=" ">
+          <rect x="198" y="558" width="504" height="34" rx="17" fill="url(#gBlackKey)" stroke="url(#gChrome)" stroke-width="1.5" filter="url(#fShadow)"/>
+          <rect x="204" y="561" width="492" height="10" rx="5" fill="rgba(255, 255, 255, 0.08)"/>
+          <ellipse cx="450" cy="564" rx="200" ry="4" fill="rgba(255,255,255,0.15)"/>
+        </g>
+
+        <!-- ── Casing bottom base plates ── -->
+        <rect x="88"  y="646" width="724" height="26" rx="13" fill="#111115" stroke="#000" stroke-width="1"/>
+        <rect x="95"  y="648" width="710" height="8"  rx="4" fill="rgba(255, 255, 255, 0.05)"/>
+
+        <!-- ── Casing heavy rubber feet ── -->
+        <ellipse cx="148" cy="667" rx="28" ry="9" fill="#09090b" filter="url(#fKeyInner)"/>
+        <ellipse cx="752" cy="667" rx="28" ry="9" fill="#09090b" filter="url(#fKeyInner)"/>
+
+      </g><!-- end filter shadow group -->
+
+      <!-- ── Tab stop ruler guide bar (above carriage) ── -->
+      <rect x="110" y="206" width="680" height="6" rx="3" fill="#222" opacity="0.9"/>
+    </svg>
+
+    <!-- ════════════════════════════════════════════════
+         PAPER TEXT OVERLAY
+         ════════════════════════════════════════════════ -->
+    <div class="paper-overlay" id="paperOverlay" aria-live="polite">
+      <div class="paper-lines-container" id="paperContainer">
+        <div class="paper-line loading-text" id="loadingLine">
+          loading<span id="loadDots">…</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.typewriter-wrap -->
+
+  <!-- Time display -->
+  <div class="status-bar" id="statusBar"></div>
+
+</div><!-- /.scene -->
+
+<script>
+// ============================================================
+//  LITERATURE CLOCK — TYPEWRITER WEB
+//  Quote data: github.com/JohannesNE/literature-clock
+// ============================================================
+
+const CSV_URL =
+  'https://raw.githubusercontent.com/JohannesNE/literature-clock/master/litclock_annotated.csv';
+
+const CHAR_DELAY_BASE = 38;   // ms per character, base
+const CHAR_DELAY_JITTER = 44; // random extra ms
+const ADVANCE_DELAY = 600;    // ms for paper-advance animation
+const MAX_OLD_LINES = 3;      // non-current quote blocks to keep
+
+let quotesMap = {};           // { 'HH:MM': [ {time, quote, source}, ... ] }
+let typingTimer = null;
+let clockStarted = false;
+let pendingAdvanceTimer = null;
+
+// ── Generate QWERTY key caps with chrome bezels and serif lettering ────────────────
+
+(function generateKeys() {
+  const rows = [
+    { y: 352, x0: 92,  dx: 56.5, keys: ["2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "½", "¼", "←"] },
+    { y: 406, x0: 120, dx: 56.5, keys: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "¢", "¾", "STARTER"] },
+    { y: 459, x0: 148, dx: 56.5, keys: ["LOCK", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "↩"] },
+    { y: 512, x0: 175, dx: 56.5, keys: ["SHIFT", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "SHIFT"] }
+  ];
+
+  let svg = '';
+  for (const row of rows) {
+    for (let i = 0; i < row.keys.length; i++) {
+      const char = row.keys[i];
+      const x = row.x0 + i * row.dx;
+      const y = row.y;
+      
+      let fillKey = 'url(#gBlackKey)';
+      let textColor = '#fdfbf7';
+      let fontSize = '13.5px';
+      
+      if (char === 'STARTER') {
+        fillKey = 'url(#gRedKey)';
+        textColor = '#ffffff';
+        fontSize = '7.5px';
+      } else if (char === 'SHIFT' || char === 'LOCK') {
+        fillKey = 'url(#gGrayKey)';
+        fontSize = '8px';
+      }
+      
+      // Chrome metal vertical key plunger stem
+      svg += `<rect x="${x - 2.5}" y="${y}" width="5" height="30" fill="url(#gChrome)" stroke="#111827" stroke-width="0.5"/>`;
+      svg += `<rect x="${x - 1.5}" y="${y}" width="1" height="30" fill="#ffffff" opacity="0.4"/>`;
+
+      // Open interactive keycap group
+      let keyId = `key-${char.toUpperCase()}`;
+      if (char === 'SHIFT') {
+        keyId = `key-SHIFT-${i === 0 ? 'L' : 'R'}`;
+      }
+      svg += `<g class="keycap" id="${keyId}" data-key="${char}" style="cursor: pointer;">`;
+
+      // Outer bezel base shadow
+      svg += `<circle cx="${x}" cy="${y + 2.5}" r="21" fill="#000" opacity="0.4"/>`;
+      // Chrome metal ring outer ring
+      svg += `<circle cx="${x}" cy="${y}" r="21" fill="url(#gChrome)" stroke="#4b5563" stroke-width="0.5"/>`;
+      // Chrome metal ring inner ring
+      svg += `<circle cx="${x}" cy="${y}" r="19.5" fill="#09090b"/>`;
+      // Concentric inner ring for 3D bezel look
+      svg += `<circle cx="${x}" cy="${y}" r="18.5" fill="none" stroke="#374151" stroke-width="1"/>`;
+      // Keycap center background
+      svg += `<circle cx="${x}" cy="${y}" r="17.2" fill="${fillKey}"/>`;
+      
+      // Text label inside the keycap
+      if (char === 'STARTER') {
+        svg += `<text x="${x}" y="${y - 1.5}" text-anchor="middle" font-family="'Special Elite', 'Georgia', serif" font-weight="bold" font-size="6px" fill="${textColor}">SELF</text>`;
+        svg += `<text x="${x}" y="${y + 5.5}" text-anchor="middle" font-family="'Special Elite', 'Georgia', serif" font-weight="bold" font-size="6px" fill="${textColor}">STARTER</text>`;
+      } else {
+        svg += `<text x="${x}" y="${y + 4.5}" text-anchor="middle" font-family="'Special Elite', 'Georgia', serif" font-weight="bold" font-size="${fontSize}" fill="${textColor}">${char}</text>`;
+      }
+      
+      // Spherical glass reflections
+      svg += `<ellipse cx="${x - 4}" cy="${y - 4}" rx="8" ry="4.5" fill="rgba(255, 255, 255, 0.16)"/>`;
+      svg += `<path d="M ${x - 11} ${y + 8} A 13.5 13.5 0 0 0 ${x + 11} ${y + 8}" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.2"/>`;
+
+      // Close keycap group
+      svg += `</g>`;
+    }
+  }
+  document.getElementById('keyGroup').innerHTML = svg;
+})();
+
+// ── CSV fetch & parse ─────────────────────────────────────────
+
+async function loadCSV() {
+  startLoadingAnimation();
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    parseCSV(text);
+    startClock();
+  } catch (err) {
+    console.error('Literature clock load failed:', err);
+    showLoadError();
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n');
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    // Format: time|time_natural|quote|title|author
+    const p = line.split('|');
+    if (p.length < 4) continue;
+    const time   = p[0].trim();
+    const quote  = p[2].trim();
+    const title  = (p[3] || '').trim();
+    const author = (p[4] || '').trim();
+    if (!/^\d{2}:\d{2}$/.test(time) || !quote) continue;
+    const source = author ? `${title} — ${author}` : title;
+    if (!quotesMap[time]) quotesMap[time] = [];
+    quotesMap[time].push({ time, quote, source });
+  }
+}
+
+// ── Clock management ──────────────────────────────────────────
+
+function startClock() {
+  clockStarted = true;
+  // Clear loading state before first quote
+  document.getElementById('paperContainer').innerHTML = '';
+  showCurrentQuote();
+
+  // Fire again at the next exact minute boundary
+  const now = new Date();
+  const msToNextMinute =
+    (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+  setTimeout(() => {
+    showCurrentQuote();
+    setInterval(showCurrentQuote, 60_000);
+  }, msToNextMinute);
+}
+
+function timeKey(d = new Date()) {
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function pickQuote(key) {
+  const list = quotesMap[key];
+  if (!list || !list.length) return null;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function showCurrentQuote() {
+  if (document.hidden || currentMode === 'MANUAL') return;
+  const key   = timeKey();
+  const quote = pickQuote(key);
+  updateStatusBar(key);
+  if (quote) advancePaper(quote);
+}
+
+// ── Paper advance + typing ────────────────────────────────────
+
+function advancePaper(quoteObj) {
+  if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  if (pendingAdvanceTimer) { clearTimeout(pendingAdvanceTimer); pendingAdvanceTimer = null; }
+
+  const container = document.getElementById('paperContainer');
+
+  // Animate the paper feeding up
+  container.classList.add('advancing');
+  container.addEventListener('animationend', () => {
+    container.classList.remove('advancing');
+  }, { once: true });
+
+  // After animation starts, age the existing lines and add new one
+  pendingAdvanceTimer = setTimeout(() => {
+    pendingAdvanceTimer = null;
+    if (document.hidden) return;
+    ageLines(container);
+    typeQuote(quoteObj, container);
+  }, ADVANCE_DELAY);
+}
+
+function ageLines(container) {
+  // current → old
+  container.querySelectorAll('.paper-line.current').forEach(el => {
+    el.classList.remove('current');
+    el.classList.add('old');
+  });
+  // old → older (dimmer still)
+  container.querySelectorAll('.paper-line.old').forEach(el => {
+    el.classList.add('older');
+  });
+  // Prune: keep only MAX_OLD_LINES aged block pairs
+  pruneOldLines(container);
+}
+
+function pruneOldLines(container) {
+  const lines = Array.from(
+    container.querySelectorAll('.paper-line:not(.current)')
+  );
+  if (lines.length > MAX_OLD_LINES * 2) {
+    const excess = lines.length - MAX_OLD_LINES * 2;
+    for (let i = 0; i < excess; i++) lines[i].remove();
+  }
+}
+
+function typeQuote(quoteObj, container) {
+  const segments  = parseSegments(quoteObj.quote);
+  const totalLen  = segments.reduce((s, seg) => s + seg.text.length, 0);
+
+  const lineEl = document.createElement('div');
+  lineEl.className = 'paper-line current';
+  lineEl.innerHTML = '<span class="cursor">|</span>';
+  container.appendChild(lineEl);
+
+  let pos = 0;
+
+  function tick() {
+    if (document.hidden) {
+      lineEl.innerHTML = buildHtml(segments, pos);
+      typingTimer = null;
+      return;
+    }
+    if (pos > totalLen) {
+      lineEl.innerHTML = buildHtml(segments, totalLen);
+      typingTimer = null;
+      return;
+    }
+    lineEl.innerHTML =
+      buildHtml(segments, pos) + '<span class="cursor">|</span>';
+    pos++;
+    const delay = CHAR_DELAY_BASE + Math.random() * CHAR_DELAY_JITTER;
+    typingTimer = setTimeout(tick, delay);
+  }
+
+  tick();
+}
+
+// ── Segment helpers ───────────────────────────────────────────
+
+function parseSegments(html) {
+  html = html.replace(/<br\s*\/?>/gi, ' ');
+  const segments = [];
+  const re = /<em>([\s\S]*?)<\/em>/g;
+  let last = 0, m;
+  while ((m = re.exec(html)) !== null) {
+    if (m.index > last)
+      segments.push({ text: html.slice(last, m.index), em: false });
+    segments.push({ text: m[1], em: true });
+    last = m.index + m[0].length;
+  }
+  if (last < html.length)
+    segments.push({ text: html.slice(last), em: false });
+  return segments;
+}
+
+function buildHtml(segments, charCount) {
+  let html = '', rem = charCount;
+  for (const seg of segments) {
+    if (rem <= 0) break;
+    const slice   = seg.text.slice(0, rem);
+    const escaped = slice
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    html += seg.em ? `<em>${escaped}</em>` : escaped;
+    rem -= seg.text.length;
+  }
+  return html;
+}
+
+// ── UI helpers ────────────────────────────────────────────────
+
+function updateStatusBar(key) {
+  const bar = document.getElementById('statusBar');
+  if (!bar) return;
+  const [hStr, mStr] = key.split(':');
+  const h    = parseInt(hStr, 10);
+  const h12  = ((h + 11) % 12 + 1);
+  const ampm = h < 12 ? 'AM' : 'PM';
+  bar.textContent = `${h12}:${mStr} ${ampm}`;
+}
+
+let loadDotsTimer;
+function startLoadingAnimation() {
+  const dots = document.getElementById('loadDots');
+  if (!dots) return;
+  let n = 1;
+  loadDotsTimer = setInterval(() => {
+    dots.textContent = '…'.padEnd(n, '.');  // subtle
+    n = (n % 3) + 1;
+  }, 500);
+}
+
+function showLoadError() {
+  clearInterval(loadDotsTimer);
+  const container = document.getElementById('paperContainer');
+  container.innerHTML =
+    '<div class="paper-line current">— connection error —</div>';
+}
+
+// ── Visibility: pause when hidden, resume when visible ────────
+
+function pauseTyping() {
+  if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  if (pendingAdvanceTimer) { clearTimeout(pendingAdvanceTimer); pendingAdvanceTimer = null; }
+  // Finalize any in-progress line — strip cursor, freeze at current chars
+  document.querySelectorAll('.cursor').forEach(el => el.remove());
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    pauseTyping();
+  } else if (clockStarted) {
+    showCurrentQuote();
+  }
+});
+
+// ── Manual Typing & Keyboard Interaction State Machine ────────
+
+let currentMode = 'AUTO'; // 'AUTO' | 'MANUAL'
+let manualText = '';
+let manualTimeout = null;
+let currentManualLine = null;
+
+function triggerKeypress(key, keycapEl) {
+  // 1. Depress the keycap visually if it exists
+  if (keycapEl) {
+    keycapEl.classList.add('active');
+    setTimeout(() => keycapEl.classList.remove('active'), 90);
+  }
+
+  // 2. Clear any active manual timeout
+  clearTimeout(manualTimeout);
+
+  // 3. Transition to MANUAL if in AUTO
+  if (currentMode === 'AUTO') {
+    currentMode = 'MANUAL';
+    pauseTyping(); // Pauses clock typing animations
+
+    // Age existing lines
+    const container = document.getElementById('paperContainer');
+    ageLines(container);
+
+    // Create a new fresh manual typing line
+    currentManualLine = document.createElement('div');
+    currentManualLine.className = 'paper-line current manual-line';
+    currentManualLine.innerHTML = '<span class="cursor">|</span>';
+    container.appendChild(currentManualLine);
+    manualText = '';
+  }
+
+  // 4. Process character/special key actions
+  if (key === '←') {
+    // Backspace
+    manualText = manualText.slice(0, -1);
+  } else if (key === '↩') {
+    // Enter (new line)
+    const container = document.getElementById('paperContainer');
+    ageLines(container);
+    
+    currentManualLine = document.createElement('div');
+    currentManualLine.className = 'paper-line current manual-line';
+    currentManualLine.innerHTML = '<span class="cursor">|</span>';
+    container.appendChild(currentManualLine);
+    manualText = '';
+  } else if (key === 'SHIFT' || key === 'LOCK' || key === 'STARTER') {
+    // Functional keys, don't type their label but reset timer
+  } else if (key.length === 1) {
+    // Standard character
+    manualText += key;
+  }
+
+  // 5. Update display with cursor
+  if (currentManualLine) {
+    const escaped = manualText
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    currentManualLine.innerHTML = escaped + '<span class="cursor">|</span>';
+  }
+
+  // 6. Reset manual idle timer
+  manualTimeout = setTimeout(() => {
+    resumeAutoMode();
+  }, 10000);
+}
+
+function resumeAutoMode() {
+  currentMode = 'AUTO';
+  
+  // Clean up any remaining manual cursors
+  document.querySelectorAll('.manual-line .cursor').forEach(el => el.remove());
+  
+  // Re-trigger standard automatic time quote
+  if (clockStarted && !document.hidden) {
+    showCurrentQuote();
+  }
+}
+
+// ── Event Routing for clicks ──
+document.getElementById('keyGroup').addEventListener('mousedown', (e) => {
+  const keycap = e.target.closest('.keycap');
+  if (keycap) {
+    const key = keycap.getAttribute('data-key');
+    triggerKeypress(key, keycap);
+  }
+});
+
+const spacebarEl = document.getElementById('key-SPACE');
+if (spacebarEl) {
+  spacebarEl.addEventListener('mousedown', (e) => {
+    triggerKeypress(' ', spacebarEl);
+  });
+}
+
+// ── Event Routing for physical keyboards ──
+window.addEventListener('keydown', (e) => {
+  let key = e.key;
+  if (key === 'Escape' || e.metaKey || e.ctrlKey || e.altKey) return;
+
+  let normKey = key.toUpperCase();
+  if (normKey === ' ') normKey = 'SPACE';
+  if (normKey === 'ENTER') normKey = '↩';
+  if (normKey === 'BACKSPACE') normKey = '←';
+
+  // Find closest matching keycap element
+  let keycap = null;
+  if (normKey === 'SPACE') {
+    keycap = document.getElementById('key-SPACE');
+  } else {
+    // Match normal character or Shift keys
+    keycap = document.getElementById(`key-${normKey}`);
+    if (!keycap && e.shiftKey) {
+      // Fallback to shift-L
+      keycap = document.getElementById('key-SHIFT-L');
+    }
+  }
+
+  if (keycap) {
+    e.preventDefault();
+    const dataKey = keycap.getAttribute('data-key');
+    // If standard character, type what the user pressed physically (case sensitive!)
+    const typeVal = (key.length === 1) ? key : dataKey;
+    triggerKeypress(typeVal, keycap);
+  } else if (key.length === 1) {
+    // If no corresponding visual key, still let the character type directly onto the paper!
+    e.preventDefault();
+    triggerKeypress(key, null);
+  }
+});
+
+// ── Boot ──────────────────────────────────────────────────────
+
+loadCSV();
+</script>
+</body>
+</html>

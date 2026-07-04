@@ -1,5 +1,6 @@
 import React from 'react'
-import { Navbar, Nav, Container } from 'react-bootstrap'
+import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap'
+import { subpages } from '../data/subpages'
 
 function Header() {
   return (
@@ -14,6 +15,19 @@ function Header() {
               <Nav.Link href="#about" aria-label="Navigate to about section">About</Nav.Link>
               <Nav.Link href="#experience" aria-label="Navigate to experience section">Experience</Nav.Link>
               <Nav.Link href="#research" aria-label="Navigate to research section">Research</Nav.Link>
+              <Nav.Link href="#speaking" aria-label="Navigate to speaking and media section">Speaking</Nav.Link>
+              <NavDropdown title="Lab" id="lab-nav-dropdown" className="custom-nav-dropdown">
+                {subpages.map((subpage, index) => (
+                  <NavDropdown.Item
+                    key={index}
+                    href={subpage.path}
+                    aria-label={`Open ${subpage.title}`}
+                  >
+                    <i className={`bi ${subpage.icon} me-2 text-primary`} aria-hidden="true"></i>
+                    {subpage.title}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
               <Nav.Link href="#contact" aria-label="Navigate to contact section">Contact</Nav.Link>
             </Nav>
           </Navbar.Collapse>

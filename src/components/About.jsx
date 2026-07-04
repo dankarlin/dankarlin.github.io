@@ -18,7 +18,7 @@ function About() {
             <div className="text-center mb-5">
               <p className="lead">
                 I'm a board-certified physician and healthcare innovator with expertise in psychiatry, 
-                addiction medicine, and clinical informatics. As Chief Medical Officer at MindMed, 
+                addiction medicine, and clinical informatics. As Chief Medical Officer at Definium Therapeutics, 
                 I lead the development of breakthrough psychedelic medicines for brain health disorders.
               </p>
               <p>

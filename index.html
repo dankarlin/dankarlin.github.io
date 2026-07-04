@@ -2,28 +2,28 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- SEO Meta Tags -->
     <title>Dr. Dan Karlin - Chief Medical Officer & Digital Medicine Innovator</title>
-    <meta name="description" content="Dr. Dan Karlin is a board-certified physician and Chief Medical Officer at MindMed, specializing in digital medicine, clinical informatics, and psychedelic medicines for brain health disorders in New York." />
-    <meta name="keywords" content="Dan Karlin, Digital Medicine, Clinical Informatics, MindMed, CMO, Psychedelic Medicine, Brain Health, Healthcare Innovation, New York" />
+    <meta name="description" content="Dr. Dan Karlin is a board-certified physician and Chief Medical Officer at Definium Therapeutics, specializing in digital medicine, clinical informatics, and psychedelic medicines for brain health disorders in New York." />
+    <meta name="keywords" content="Dan Karlin, Digital Medicine, Clinical Informatics, Definium Therapeutics, CMO, Psychedelic Medicine, Brain Health, Healthcare Innovation, New York" />
     <meta name="author" content="Dr. Dan Karlin" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://dankarlin.com/" />
     <meta property="og:title" content="Dr. Dan Karlin - Chief Medical Officer & Digital Medicine Innovator" />
-    <meta property="og:description" content="Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. Leading the development of psychedelic medicines for brain health disorders at MindMed." />
-    <meta property="og:image" content="https://dankarlin.com/dan-karlin-photo.jpg" />
+    <meta property="og:description" content="Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. Leading the development of psychedelic medicines for brain health disorders at Definium Therapeutics." />
+    <meta property="og:image" content="https://dankarlin.com/dan-karlin-photo.webp" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://dankarlin.com/" />
     <meta property="twitter:title" content="Dr. Dan Karlin - Chief Medical Officer & Digital Medicine Innovator" />
-    <meta property="twitter:description" content="Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. Leading the development of psychedelic medicines for brain health disorders at MindMed." />
-    <meta property="twitter:image" content="https://dankarlin.com/dan-karlin-photo.jpg" />
+    <meta property="twitter:description" content="Board-certified physician specializing in digital medicine, clinical informatics, and healthcare innovation. Leading the development of psychedelic medicines for brain health disorders at Definium Therapeutics." />
+    <meta property="twitter:image" content="https://dankarlin.com/dan-karlin-photo.webp" />
     <meta name="twitter:creator" content="@dankarlin" />
     
     <!-- Additional Meta Tags -->
@@ -33,7 +33,9 @@
     
     <!-- Preload Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preload" href="/dan-karlin-photo.jpg" as="image" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" href="/dan-karlin-photo.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="/dan-karlin-photo.jpg" as="image" type="image/jpeg" />
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
     
     <!-- Theme Color -->
@@ -50,7 +52,7 @@
       .profile-photo { width: 200px; height: 200px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); object-fit: cover; margin: 0 auto; display: block; }
       .display-3 { font-weight: 700; letter-spacing: -0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
       /* Prevent layout shift */
-      .container, .row, .col { max-width: 100%; }
+      .container, .col { max-width: 100%; }
     </style>
     
     <!-- PWA Manifest -->
@@ -65,11 +67,11 @@
       "jobTitle": "Chief Medical Officer",
       "worksFor": {
         "@type": "Organization",
-        "name": "MindMed"
+        "name": "Definium Therapeutics"
       },
       "description": "Board-certified physician specializing in digital medicine, clinical informatics, and psychedelic medicines for brain health disorders",
       "url": "https://dankarlin.com",
-      "image": "https://dankarlin.com/dan-karlin-photo.jpg",
+      "image": "https://dankarlin.com/dan-karlin-photo.webp",
       "sameAs": [
         "https://linkedin.com/in/dankarlin",
         "https://twitter.com/dankarlin",
@@ -106,5 +108,33 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+      
+      // Web Vitals tracking
+      import('https://unpkg.com/web-vitals@3/dist/web-vitals.js').then(({getCLS, getFID, getFCP, getLCP, getTTFB}) => {
+        function sendToAnalytics(metric) {
+          // Log to console for now - could send to analytics service
+          console.log(metric);
+        }
+        getCLS(sendToAnalytics);
+        getFID(sendToAnalytics);
+        getFCP(sendToAnalytics);
+        getLCP(sendToAnalytics);
+        getTTFB(sendToAnalytics);
+      });
+    </script>
   </body>
 </html>

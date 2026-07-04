@@ -23,16 +23,6 @@ function Contact() {
                   
                   <div className="d-flex flex-column flex-md-row gap-3 justify-content-center mb-4">
                     <a 
-                      href="mailto:dankarlin@gmail.com"
-                      className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
-                      style={{fontSize: '0.9rem', padding: '10px 20px'}}
-                      aria-label="Send email to Dr. Dan Karlin"
-                    >
-                      <i className="bi bi-envelope me-2" aria-hidden="true"></i>
-                      Email Me
-                    </a>
-                    
-                    <a 
                       href="https://linkedin.com/in/dankarlin"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -44,28 +34,16 @@ function Contact() {
                       LinkedIn
                     </a>
                     
-                    <a 
-                      href="https://twitter.com/dankarlin"
+                    <a
+                      href="https://bsky.app/profile/dankarlin.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
                       style={{fontSize: '0.9rem', padding: '10px 20px'}}
-                      aria-label="Visit Dr. Dan Karlin's Twitter profile (opens in new tab)"
+                      aria-label="Visit Dr. Dan Karlin's Bluesky profile (opens in new tab)"
                     >
-                      <i className="bi bi-twitter me-2" aria-hidden="true"></i>
-                      Twitter
-                    </a>
-                    
-                    <a 
-                      href="https://scholar.google.com/citations?user=mCflbZoAAAAJ&hl=en"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-outline-primary d-flex align-items-center justify-content-center text-decoration-none"
-                      style={{fontSize: '0.9rem', padding: '10px 20px'}}
-                      aria-label="Visit Dr. Dan Karlin's Google Scholar profile (opens in new tab)"
-                    >
-                      <i className="bi bi-mortarboard me-2" aria-hidden="true"></i>
-                      Google Scholar
+                      <i className="bi bi-cloud me-2" aria-hidden="true"></i>
+                      Bluesky
                     </a>
                   </div>
                   
@@ -76,7 +54,7 @@ function Contact() {
                     </p>
                     <p className="mb-0">
                       <i className="bi bi-briefcase me-2"></i>
-                      Chief Medical Officer at MindMed
+                      Chief Medical Officer at Definium Therapeutics
                     </p>
                   </div>
                 </div>

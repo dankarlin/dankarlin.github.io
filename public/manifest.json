@@ -1,7 +1,7 @@
 {
   "name": "Dr. Dan Karlin - Chief Medical Officer & Digital Health Innovator",
   "short_name": "Dan Karlin MD",
-  "description": "Professional portfolio of Dr. Dan Karlin, Chief Medical Officer at MindMed and digital health innovator",
+  "description": "Professional portfolio of Dr. Dan Karlin, Chief Medical Officer at Definium Therapeutics and digital health innovator",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1e40af",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/vite.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

@@ -2,6 +2,51 @@ import React from 'react'
 import { Container, Row, Col, Card, Badge } from 'react-bootstrap'
 
 function Research() {
+  const publications = [
+    {
+      title: 'Single treatment with MM120 (lysergide) in generalized anxiety disorder: a randomized clinical trial',
+      journal: 'JAMA',
+      year: 2025,
+      citations: 20
+    },
+    {
+      title: 'Digital medicine: a primer on measurement',
+      journal: 'Digital Biomarkers',
+      year: 2019,
+      citations: 194
+    },
+    {
+      title: 'Implementing precision methods in personalizing psychological therapies: Barriers and possible ways forward',
+      journal: 'Behaviour Research and Therapy',
+      year: 2024,
+      citations: 129
+    },
+    {
+      title: 'mHealth and wearable technology should replace motor diaries to track motor fluctuations in Parkinson\'s disease',
+      journal: 'NPJ Digital Medicine',
+      year: 2020,
+      citations: 127
+    },
+    {
+      title: 'Continuous sound collection using smartphones and machine learning to measure cough',
+      journal: 'Digital Biomarkers',
+      year: 2020,
+      citations: 91
+    },
+    {
+      title: 'A systematic review of feasibility studies promoting the use of mobile technologies in clinical research',
+      journal: 'NPJ Digital Medicine',
+      year: 2019,
+      citations: 67
+    },
+    {
+      title: 'Biometric monitoring devices for assessing end points in clinical trials: developing an ecosystem',
+      journal: 'Nature Reviews Drug Discovery',
+      year: 2017,
+      citations: 43
+    }
+  ]
+
   const researchAreas = [
     {
       title: 'Digital Medicine & Biomarkers',
@@ -89,33 +134,32 @@ function Research() {
 
         <Row className="mt-5">
           <Col lg={10} className="mx-auto">
-            <Card className="bg-light border-0">
-              <Card.Body className="p-4">
-                <Row className="align-items-center">
-                  <Col md={8}>
-                    <h4 className="mb-3">Academic Impact</h4>
-                    <p className="mb-2">
-                      My research contributions span multiple domains of digital medicine, with publications in 
-                      peer-reviewed journals and presentations at major medical conferences.
-                    </p>
-                    <div className="d-flex gap-3 flex-wrap">
-                      <Badge bg="primary" className="p-2">Digital Biomarkers</Badge>
-                      <Badge bg="primary" className="p-2">Clinical Trials</Badge>
-                      <Badge bg="primary" className="p-2">Healthcare Technology</Badge>
-                      <Badge bg="primary" className="p-2">Brain Health</Badge>
-                    </div>
-                  </Col>
-                  <Col md={4} className="text-center">
-                    <div className="d-flex flex-column gap-2">
-                      <div>
-                        <h5 className="text-primary mb-1">Research Focus</h5>
-                        <small className="text-muted">Digital Medicine & Clinical Innovation</small>
-                      </div>
-                    </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
+            <h3 className="text-center mb-4">Selected Publications</h3>
+            <div className="section-divider mb-4"></div>
+            {publications.map((pub, index) => (
+              <div key={index} className={`py-3 ${index < publications.length - 1 ? 'border-bottom' : ''}`}>
+                <p className="mb-1 fw-semibold">{pub.title}</p>
+                <div className="d-flex gap-3 flex-wrap align-items-center">
+                  <small className="text-primary fw-medium">{pub.journal}</small>
+                  <small className="text-muted">{pub.year}</small>
+                  <Badge bg="light" text="dark" className="fw-normal border">
+                    <i className="bi bi-chat-quote me-1" aria-hidden="true"></i>{pub.citations} citations
+                  </Badge>
+                </div>
+              </div>
+            ))}
+            <div className="text-center mt-4">
+              <a
+                href="https://scholar.google.com/citations?user=mCflbZoAAAAJ&hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline-secondary btn-sm text-decoration-none"
+                aria-label="View all publications on Google Scholar (opens in new tab)"
+              >
+                <i className="bi bi-mortarboard me-2" aria-hidden="true"></i>
+                View all publications on Google Scholar
+              </a>
+            </div>
           </Col>
         </Row>
       </Container>
