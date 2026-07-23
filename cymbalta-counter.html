@@ -553,7 +553,7 @@
 
     for (const sub of SUB_COUNTERS) {
       const e = elapsedSince(sub.start, now);
-      sub.el.textContent = `${e.years}y ${e.days}d ${pad(e.hours)}:${pad(e.minutes)}:${pad(e.seconds)}`;
+      sub.el.textContent = `${e.years}y ${e.days}d`;
     }
   }
 
