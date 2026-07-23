@@ -269,6 +269,46 @@
     animation: tickPulse 0.4s ease-out forwards;
   }
 
+  /* ── SUB-COUNTERS ── */
+  .sub-counters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem 3rem;
+    margin-top: 3rem;
+    padding-top: 2.25rem;
+    border-top: 1px solid rgba(200, 185, 122, 0.08);
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .sub-counter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sub-counter-value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 2.1vw, 1.35rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    color: #9a8a4a;
+  }
+
+  .sub-counter-label {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.58rem, 1.05vw, 0.66rem);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #666;
+    max-width: 16ch;
+    line-height: 1.4;
+  }
+
   /* ── DIVIDER ── */
   .divider {
     width: 1px;
@@ -415,6 +455,21 @@
     <div class="context-divider"></div>
     <p class="context-conclusion">No GAD drug has been approved since</p>
   </div>
+
+  <div class="sub-counters">
+    <div class="sub-counter">
+      <div class="sub-counter-value" id="lsd-synth">—</div>
+      <div class="sub-counter-label">Since LSD First Synthesized</div>
+    </div>
+    <div class="sub-counter">
+      <div class="sub-counter-value" id="lsd-effects">—</div>
+      <div class="sub-counter-label">Since Hofmann Discovered Its Effects</div>
+    </div>
+    <div class="sub-counter">
+      <div class="sub-counter-value" id="lsd-schedule1">—</div>
+      <div class="sub-counter-label">Since LSD Placed On Schedule I</div>
+    </div>
+  </div>
 </main>
 
 <footer class="footer">
@@ -443,26 +498,29 @@
     seconds: document.getElementById('seconds'),
   };
 
+  const SUB_COUNTERS = [
+    // Hofmann first synthesized LSD-25 at Sandoz Laboratories
+    { start: new Date('1938-11-16T00:00:00'), el: document.getElementById('lsd-synth') },
+    // Hofmann accidentally absorbed LSD and discovered its effects
+    { start: new Date('1943-04-16T00:00:00'), el: document.getElementById('lsd-effects') },
+    // Controlled Substances Act took effect, placing LSD on Schedule I
+    { start: new Date('1971-05-01T00:00:00'), el: document.getElementById('lsd-schedule1') },
+  ];
+
   let lastSeconds = -1;
 
   function pad(n, width = 2) {
     return String(n).padStart(width, '0');
   }
 
-  function update() {
-    const now = new Date();
-    const totalMs = now - START;
-
-    // Total seconds elapsed
-    const totalSec = Math.floor(totalMs / 1000);
-
+  function elapsedSince(start, now) {
     // Years: count actual calendar years
-    let years = now.getFullYear() - START.getFullYear();
-    const anniversaryThisYear = new Date(now.getFullYear(), START.getMonth(), START.getDate());
+    let years = now.getFullYear() - start.getFullYear();
+    const anniversaryThisYear = new Date(now.getFullYear(), start.getMonth(), start.getDate());
     if (now < anniversaryThisYear) years--;
 
     // Days since last anniversary
-    const lastAnniversary = new Date(START.getFullYear() + years, START.getMonth(), START.getDate());
+    const lastAnniversary = new Date(start.getFullYear() + years, start.getMonth(), start.getDate());
     const msSinceAnniversary = now - lastAnniversary;
     const daysSinceAnniversary = Math.floor(msSinceAnniversary / (1000 * 60 * 60 * 24));
 
@@ -472,8 +530,15 @@
     const minutes = Math.floor((remainder % 3600000) / 60000);
     const seconds = Math.floor((remainder % 60000) / 1000);
 
+    return { years, days: daysSinceAnniversary, hours, minutes, seconds };
+  }
+
+  function update() {
+    const now = new Date();
+    const { years, days, hours, minutes, seconds } = elapsedSince(START, now);
+
     el.years.textContent   = years;
-    el.days.textContent    = daysSinceAnniversary;
+    el.days.textContent    = days;
     el.hours.textContent   = pad(hours);
     el.minutes.textContent = pad(minutes);
 
@@ -484,6 +549,11 @@
       void el.seconds.offsetWidth;
       el.seconds.classList.add('tick-flash');
       lastSeconds = seconds;
+    }
+
+    for (const sub of SUB_COUNTERS) {
+      const e = elapsedSince(sub.start, now);
+      sub.el.textContent = `${e.years}y ${e.days}d ${pad(e.hours)}:${pad(e.minutes)}:${pad(e.seconds)}`;
     }
   }
 
